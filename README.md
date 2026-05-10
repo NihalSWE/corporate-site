@@ -36,8 +36,8 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Visit: http://127.0.0.1:8000  
-Admin: http://127.0.0.1:8000/admin
+Visit: http://admiralgroupbd.com/  
+Admin: http://admiralgroupbd.com/dashboard/
 
 ## 👤 Author
 **Nihal** — [@NihalSWE](https://github.com/NihalSWE)
