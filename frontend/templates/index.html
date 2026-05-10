@@ -66,6 +66,11 @@
       line-height: 1;
       cursor: pointer;
    }
+   .image_box_new .video_box,
+   .image_box_new .video_box a {
+      z-index: 10;
+      pointer-events: auto;
+   }
    .slider.style_page_thirteen {
       overflow: hidden;
    }
@@ -266,9 +271,11 @@
                       {% endif %}
                    </div>
                    <div class="video_box video-inner text-center">
-                      <a href="{{ home_about_video_url|default:'#' }}" class="js-home-about-video" data-src="{{ home_about_video_url }}" data-original="{{ home_about_video_original_url }}" data-kind="{% if home_about_video_is_direct %}video{% else %}iframe{% endif %}">
+                      {% if home_about_video_url %}
+                      <a href="{{ home_about_video_url }}" class="js-home-about-video" data-src="{{ home_about_video_url }}" data-original="{{ home_about_video_original_url }}" data-kind="{% if home_about_video_is_direct %}video{% else %}iframe{% endif %}">
                          <i class="icon-play"></i>
                       </a>
+                      {% endif %}
                    </div>
                    <div class="image_two">
                       {% if home_about_media and home_about_media.small_image %}
@@ -869,6 +876,7 @@
          modal.classList.remove("is-open");
          modal.setAttribute("aria-hidden", "true");
          frame.innerHTML = "";
+         document.body.style.overflow = "";
       }
 
       if (openButton && modal && frame) {
@@ -879,13 +887,25 @@
             const original = openButton.dataset.original || src;
             const kind = openButton.dataset.kind || "iframe";
             fallbackLink.href = original;
+            frame.innerHTML = "";
             if (kind === "video") {
-               frame.innerHTML = '<video controls autoplay playsinline src="' + src + '"></video>';
+               const video = document.createElement("video");
+               video.src = src;
+               video.controls = true;
+               video.autoplay = true;
+               video.playsInline = true;
+               frame.appendChild(video);
             } else {
-               frame.innerHTML = '<iframe src="' + autoplayUrl(src) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+               const iframe = document.createElement("iframe");
+               iframe.src = autoplayUrl(src);
+               iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share";
+               iframe.allowFullscreen = true;
+               iframe.referrerPolicy = "strict-origin-when-cross-origin";
+               frame.appendChild(iframe);
             }
             modal.classList.add("is-open");
             modal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
          });
 
          closeButton.addEventListener("click", closeVideo);

@@ -57,6 +57,23 @@
       cursor: pointer;
    }
    .about-video-close:hover { background: rgba(0, 0, 0, 0.72); }
+   .image_boxes .video_box,
+   .image_boxes .video_box a {
+      z-index: 80;
+      pointer-events: auto;
+   }
+   .about-media-float {
+      position: relative;
+      z-index: 90;
+   }
+   .about-media-float .image_boxes,
+   .about-media-float .image.two {
+      z-index: 90;
+   }
+   .about-content-flow {
+      position: relative;
+      z-index: 1;
+   }
    .about-flow-row {
       display: block;
    }
@@ -71,7 +88,7 @@
       padding-left: 32px;
       margin-bottom: 24px;
       position: relative;
-      z-index: 2;
+      z-index: 90;
    }
    .about-content-flow {
       float: none;
@@ -148,7 +165,7 @@
 </div>
 
 <div id="content" class="site-content">
-   <section class="about-section">
+   <section class="about-section about-page-main">
       <div class="pd_top_90"></div>
       <div class="container">
          <div class="row about-flow-row">
@@ -169,7 +186,9 @@
                      <img src="{% static 'assets/images/about/about-7.png' %}" class="img-fluid" alt="video">
                      {% endif %}
                      <div class="video_box">
-                        <a href="{{ video_url|default:'#' }}" class="js-about-video-open" data-src="{{ video_url }}" data-original="{{ video_original_url }}" data-kind="{% if video_is_direct %}video{% else %}iframe{% endif %}"><i class="icon-play"></i></a>
+                        {% if video_url %}
+                        <a href="{{ video_url }}" class="js-about-video-open" data-src="{{ video_url }}" data-original="{{ video_original_url }}" data-kind="{% if video_is_direct %}video{% else %}iframe{% endif %}"><i class="icon-play"></i></a>
+                        {% endif %}
                      </div>
                   </div>
                </div>
@@ -230,7 +249,7 @@
       const modal = document.getElementById("aboutVideoLightbox");
       const frame = document.getElementById("aboutVideoFrame");
       const fallback = document.getElementById("aboutVideoFallback");
-      const fallbackLink = fallback.querySelector("a");
+      const fallbackLink = fallback ? fallback.querySelector("a") : null;
       const closeButton = document.getElementById("aboutVideoClose");
 
       function autoplayUrl(src) {
@@ -244,10 +263,10 @@
       }
 
       function openVideo(src, kind, original) {
-         if (!src) return;
+         if (!src || !modal || !frame) return;
          frame.innerHTML = "";
-         fallbackLink.href = original || src;
-         fallback.style.display = original ? "block" : "none";
+         if (fallbackLink) fallbackLink.href = original || src;
+         if (fallback) fallback.style.display = original ? "block" : "none";
          if (kind === "video") {
             const video = document.createElement("video");
             video.src = src;
@@ -269,24 +288,27 @@
       }
 
       function closeVideo() {
+         if (!modal || !frame) return;
          modal.classList.remove("is-open");
          modal.setAttribute("aria-hidden", "true");
          frame.innerHTML = "";
-         fallbackLink.href = "#";
+         if (fallbackLink) fallbackLink.href = "#";
          document.body.style.overflow = "";
       }
 
-      if (openButton) {
-         openButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            openVideo(openButton.dataset.src, openButton.dataset.kind, openButton.dataset.original);
+      document.addEventListener("click", function (event) {
+         const button = event.target.closest(".js-about-video-open");
+         if (!button) return;
+         event.preventDefault();
+         openVideo(button.dataset.src || button.getAttribute("href"), button.dataset.kind || "iframe", button.dataset.original);
+      });
+
+      if (closeButton) closeButton.addEventListener("click", closeVideo);
+      if (modal) {
+         modal.addEventListener("click", function (event) {
+            if (event.target === modal) closeVideo();
          });
       }
-
-      closeButton.addEventListener("click", closeVideo);
-      modal.addEventListener("click", function (event) {
-         if (event.target === modal) closeVideo();
-      });
       document.addEventListener("keydown", function (event) {
          if (event.key === "Escape" && modal.classList.contains("is-open")) closeVideo();
       });
