@@ -30,7 +30,8 @@
    <link rel="stylesheet" href="{% static 'assets/css/woocommerce.css' %}" type="text/css" media="all" />
    <style>
       .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu {
-         min-width: 280px;
+         width: 300px;
+         min-width: 300px;
          padding: 12px;
          border: 1px solid rgba(15, 23, 42, 0.06);
          border-radius: 8px;
@@ -73,23 +74,37 @@
          min-height: 42px;
          display: flex;
          align-items: center;
+         justify-content: flex-start;
+         width: 100%;
          padding: 9px 14px;
          border-radius: 6px;
          font-size: 15px;
          font-weight: 600;
-         white-space: nowrap;
+         line-height: 1.45;
+         white-space: normal;
+         text-align: left;
          background: transparent !important;
          transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
       }
 
       .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item:before {
          content: "";
+         flex: 0 0 6px;
          width: 6px;
          height: 6px;
          border-radius: 50%;
          margin-right: 10px;
          background: rgba(7, 133, 134, 0.24);
          transition: background-color 0.18s ease, transform 0.18s ease;
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item span {
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         text-align: left;
       }
 
       .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item:hover {

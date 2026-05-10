@@ -1172,9 +1172,6 @@ def sister_concern_admin(request):
             if action == "add":
                 logo = request.FILES.get("logo")
                 display_image = request.FILES.get("display_image")
-                if not display_image:
-                    messages.error(request, "Please upload a sister concern display image.")
-                    return redirect("sister_concern_items")
 
                 concern = SisterConcern(
                     title=request.POST.get("title", "").strip(),

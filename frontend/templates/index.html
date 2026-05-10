@@ -14,6 +14,27 @@
       object-fit: contain;
       padding: 34px;
    }
+   .service_box.type_one .content_box {
+      min-height: 150px;
+   }
+   .home-sister-title {
+      min-height: 32px;
+      margin-bottom: 8px;
+   }
+   .home-sister-title a {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.35;
+   }
+   .home-sister-description {
+      min-height: 28px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
    .home-about-lightbox {
       position: fixed;
       inset: 0;
@@ -489,8 +510,10 @@
                          <div class="image_box">
                             {% if concern.display_image %}
                             <img src="{{ concern.display_image.url }}" class="img-fluid home-service-logo" alt="{{ concern.title }}" />
-                            {% else %}
+                            {% elif concern.logo %}
                             <img src="{{ concern.logo.url }}" class="img-fluid home-service-logo is-logo" alt="{{ concern.title }}" />
+                            {% else %}
+                            <img src="{% static 'assets/images/service/service-image-6.jpg' %}" class="img-fluid home-service-logo" alt="{{ concern.title }}" />
                             {% endif %}
                             <div class="overlay"></div>
                          </div>
@@ -502,10 +525,10 @@
                                </div>
 
                             </div>
-                            <h2 class="entry-title">
+                            <h2 class="entry-title home-sister-title">
                                <a href="{% url 'sister_concern_detail' concern.slug %}">{{ concern.title }}</a>
                             </h2>
-                            <p>{{ concern.description|striptags|truncatechars:52 }}</p>
+                            <p class="home-sister-description">{{ concern.description|striptags }}</p>
                             <a href="{% url 'sister_concern_detail' concern.slug %}" class="read_more type_one">
                                <span class="icon-arrow-right"></span>
                                Read More
