@@ -1,0 +1,114 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h3>Website Branding</h3>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row g-4">
+                    <div class="col-lg-12">
+                        <div class="border rounded p-3">
+                            <h5 class="mb-3">Top Header Text</h5>
+                            <div class="row">
+                                <div class="col-lg-8 mb-3 mb-lg-0">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="form-label fw-bold">Welcome Text</label>
+                                        <small class="text-muted"><span id="top-message-count">0</span>/80</small>
+                                    </div>
+                                    <input type="text" name="top_message" id="top-message" class="form-control" maxlength="80" value="{{ header_setting.top_message|default:'Welcome to our consulting company.' }}">
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="form-label fw-bold">Quote Button Text</label>
+                                        <small class="text-muted"><span id="quote-button-count">0</span>/20</small>
+                                    </div>
+                                    <input type="text" name="quote_button_text" id="quote-button-text" class="form-control" maxlength="20" value="{{ header_setting.quote_button_text|default:'Get a quote' }}">
+                                    <small class="text-muted d-block mt-2">Button links to the contact page.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="border rounded p-3 h-100">
+                            <label class="form-label fw-bold">Website Logo</label>
+                            <input type="file" name="logo" class="form-control" accept="image/*">
+                            <small class="text-muted d-block mt-2">Maximum file size: 10KB.</small>
+
+                            {% if logo and logo.image %}
+                                <div class="mt-3 p-3 border rounded bg-light d-inline-block">
+                                    <p class="mb-2 text-muted">Current logo</p>
+                                    <img src="{{ logo.image.url }}" alt="Website logo" style="max-height: 70px; max-width: 220px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="border rounded p-3 h-100">
+                            <label class="form-label fw-bold">Website Favicon</label>
+                            <input type="file" name="favicon" class="form-control" accept="image/*">
+                            <small class="text-muted d-block mt-2">Maximum file size: 10KB.</small>
+
+                            {% if favicon and favicon.image %}
+                                <div class="mt-3 p-3 border rounded bg-light d-inline-block">
+                                    <p class="mb-2 text-muted">Current favicon</p>
+                                    <img src="{{ favicon.image.url }}" alt="Website favicon" style="width: 42px; height: 42px; object-fit: contain;">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Save Branding</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    (function () {
+        const topMessage = document.getElementById("top-message");
+        const quoteButton = document.getElementById("quote-button-text");
+        const topCount = document.getElementById("top-message-count");
+        const quoteCount = document.getElementById("quote-button-count");
+
+        function syncCount(field, counter, limit) {
+            if (field.value.length > limit) {
+                field.value = field.value.slice(0, limit);
+            }
+            counter.textContent = field.value.length;
+        }
+
+        function syncAll() {
+            syncCount(topMessage, topCount, 80);
+            syncCount(quoteButton, quoteCount, 20);
+        }
+
+        [topMessage, quoteButton].forEach(function (field) {
+            field.addEventListener("input", syncAll);
+            field.addEventListener("paste", function () {
+                setTimeout(syncAll, 0);
+            });
+        });
+
+        syncAll();
+    })();
+</script>
+{% endblock scriptcontent %}

@@ -1,0 +1,220 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/jquery.dataTables.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/dataTables.bootstrap5.css' %}">
+<style>
+  .team-thumb { width: 58px; height: 62px; object-fit: cover; border-radius: 6px; }
+  .error-success-div {
+    max-height: 0;
+    opacity: 0;
+    padding: 10px 18px;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: max-height .3s ease, opacity .3s ease;
+  }
+  .error-success-div.show { max-height: 180px; opacity: 1; }
+  .success-message { background: #10cf1057; color: #096009; }
+  .error-message { background: #ff0d0d78; color: #890000; }
+  .action i { cursor: pointer; }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="container-fluid datatable-init">
+  <div class="card">
+    <div class="card-header pb-0 card-no-border">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1>Our Team</h1>
+          <p class="text-muted mb-0">Manage team members shown on the frontend Our Team page.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <button class="btn btn-pill btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addModal">
+            <i class="fa-solid fa-plus me-2"></i>Add Member
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive custom-scrollbar">
+        <table class="display table-striped border" id="basic-1">
+          <thead>
+            <tr>
+              <th>S/L</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Order</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for member in members %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><img class="team-thumb" src="{{ member.image.url }}" alt="{{ member.name }}"></td>
+              <td class="fw-bold">{{ member.name }}</td>
+              <td>{{ member.designation }}</td>
+              <td>{{ member.sort_order }}</td>
+              <td>
+                {% if member.is_active %}
+                <span class="badge rounded-pill badge-light-success">Active</span>
+                {% else %}
+                <span class="badge rounded-pill badge-light-danger">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <ul class="action">
+                  <li class="edit">
+                    <i class="fa-regular fa-pen-to-square edit-icon"
+                       data-bs-toggle="modal"
+                       data-bs-target="#editModal"
+                       data-id="{{ member.id }}"
+                       data-name="{{ member.name }}"
+                       data-designation="{{ member.designation }}"
+                       data-facebook="{{ member.facebook|default:'' }}"
+                       data-linkedin="{{ member.linkedin|default:'' }}"
+                       data-twitter="{{ member.twitter|default:'' }}"
+                       data-youtube="{{ member.youtube|default:'' }}"
+                       data-sort-order="{{ member.sort_order }}"
+                       data-active="{{ member.is_active }}"></i>
+                  </li>
+                  <li class="delete">
+                    <i class="fa-solid fa-trash-can delete-icon" data-id="{{ member.id }}" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal"></i>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 class="text-center">Add Team Member</h1>
+        <form class="form theme-form dark-inputs" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add">
+          {% include "team/partials/member_form_fields.html" %}
+          <div class="px-4 mb-2"><div class="error-success-div"></div></div>
+          <div class="card-footer text-end">
+            <button class="btn btn-primary me-3" type="submit">Submit</button>
+            <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 class="text-center">Edit Team Member</h1>
+        <form class="form theme-form dark-inputs" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="edit">
+          <input type="hidden" name="id" id="edit-id">
+          {% include "team/partials/member_form_fields.html" with edit=True %}
+          <div class="px-4 mb-2"><div class="error-success-div"></div></div>
+          <div class="card-footer text-end">
+            <button class="btn btn-primary me-3" type="submit">Update</button>
+            <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <h4 class="mb-3">Are you sure?</h4>
+        <p class="mb-4">This action will permanently delete this member.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button id="confirm-delete" class="btn btn-danger">Yes, Delete</button>
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/dataTables1.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom2.js' %}"></script>
+
+<script>
+  function showMessage(type, message, context) {
+    const div = $(context).find(".error-success-div");
+    div.removeClass("error-message success-message show").addClass(type + "-message").text(message);
+    requestAnimationFrame(() => div.addClass("show"));
+    if (type === "success") setTimeout(() => location.reload(), 1200);
+  }
+
+  $("#addModal form").on("submit", function (e) {
+    e.preventDefault();
+    fetch("{% url 'team_members' %}", {
+      method: "POST",
+      body: new FormData(this),
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => showMessage(d.status, d.message, "#addModal"));
+  });
+
+  $(document).on("click", ".edit-icon", function () {
+    const ds = this.dataset;
+    $("#edit-id").val(ds.id);
+    $("#editModal [name='name']").val(ds.name);
+    $("#editModal [name='designation']").val(ds.designation);
+    $("#editModal [name='facebook']").val(ds.facebook);
+    $("#editModal [name='linkedin']").val(ds.linkedin);
+    $("#editModal [name='twitter']").val(ds.twitter);
+    $("#editModal [name='youtube']").val(ds.youtube);
+    $("#editModal [name='sort_order']").val(ds.sortOrder);
+    $("#editModal [name='is_active']").prop("checked", ds.active === "True");
+  });
+
+  $("#editModal form").on("submit", function (e) {
+    e.preventDefault();
+    fetch("{% url 'team_members' %}", {
+      method: "POST",
+      body: new FormData(this),
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => showMessage(d.status, d.message, "#editModal"));
+  });
+
+  let pendingDeleteId = null;
+  $(document).on("click", ".delete-icon", function () {
+    pendingDeleteId = this.dataset.id;
+  });
+
+  $("#confirm-delete").on("click", function () {
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("id", pendingDeleteId);
+    fetch("{% url 'team_members' %}", {
+      method: "POST",
+      body: formData,
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => {
+      if (d.status === "success") location.reload();
+      else alert(d.message);
+    });
+  });
+</script>
+{% endblock scriptcontent %}

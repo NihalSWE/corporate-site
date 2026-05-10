@@ -1,0 +1,35 @@
+from django.urls import path
+from .import views
+
+
+urlpatterns = [
+    path('', views.dashboard_home, name='dashboard_home'),
+    path('users/', views.users_home, name='users_home'),
+    path('home/banner/', views.home_banner_admin, name='banner'),
+    path('home/about-media/', views.home_about_media_admin, name='home_about_media'),
+    path('home/business/', views.home_business_admin, name='home_business'),
+    path('home/services-text/', views.home_services_section_admin, name='home_services_section'),
+    path('home/why-choose/', views.home_why_choose_admin, name='home_why_choose'),
+    path('home/faq/', views.home_faq_admin, name='home_faq'),
+    path('home/mailing-subscribers/', views.home_mailing_subscribers_admin, name='home_mailing_subscribers'),
+    path('home/identity/', views.branding_admin, name='home_identity'),
+    path('about/banner/', views.about_banner_admin, name='about_banner'),
+    path('about/hero/', views.about_hero_admin, name='about_hero'),
+    path('contactus/banner/', views.contact_banner_admin, name='contact_banner'),
+    path('contactus/info-cards/', views.contact_info_admin, name='contact_info_cards'),
+    path('contactus/messages/', views.contact_messages_admin, name='contact_messages'),
+    path('contactus/map/', views.contact_map_admin, name='contact_map'),
+    path('gallery/video/banner/', views.video_gallery_banner_admin, name='video_gallery_banner'),
+    path('gallery/video/items/', views.video_gallery_admin, name='video_gallery_items'),
+    path('gallery/photo/banner/', views.photo_gallery_banner_admin, name='photo_gallery_banner'),
+    path('gallery/photo/items/', views.photo_gallery_admin, name='photo_gallery_items'),
+    path('gallery/main/', views.photo_gallery_admin, name='gallery_main'),
+    path('sister-concern/banner/', views.sister_concern_banner_admin, name='sister_concern_banner'),
+    path('sister-concern/items/', views.sister_concern_admin, name='sister_concern_items'),
+    path('team/banner/', views.team_banner_admin, name='team_banner'),
+    path('team/members/', views.team_members_admin, name='team_members'),
+    path('login/', views.login_home, name='login_home'),
+    path('logout/', views.logout_home, name='logout_home'),
+    path('profile/', views.profile_home, name='profile_home'),
+    path('signup/', views.signup_home, name='signup_home'),
+]

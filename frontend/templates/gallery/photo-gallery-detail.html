@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .photo-detail-section { background: #fff; padding: 72px 0 90px; }
+   .gallery-heading { text-align: center; margin-bottom: 44px; }
+   .gallery-heading h1 { color: #202b36; font-size: 32px; font-weight: 800; line-height: 1.2; margin: 0; letter-spacing: 6px; text-transform: uppercase; }
+   .gallery-heading .line { display: block; width: 80px; height: 4px; border-radius: 4px; margin: 22px auto 0; background: linear-gradient(90deg, #006cff, #00d0bd); }
+   .image-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+   .image-card { display: block; border-radius: 7px; overflow: hidden; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14); background: #f3f5f7; }
+   .image-card img { width: 100%; aspect-ratio: 272 / 181; object-fit: cover; display: block; transition: transform .2s ease; }
+   .image-card:hover img { transform: scale(1.04); }
+   .custom-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 18, 22, 0.88);
+      padding: 58px 76px;
+   }
+   .custom-lightbox.is-open { display: flex; }
+   .custom-lightbox-image {
+      max-width: calc(100vw - 180px);
+      max-height: calc(100vh - 130px);
+      object-fit: contain;
+      display: block;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+   }
+   .custom-lightbox-btn {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.42);
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+   }
+   .custom-lightbox-btn:hover { background: rgba(0, 0, 0, 0.68); color: #fff; }
+   .custom-lightbox-close { top: 18px; right: 22px; }
+   .custom-lightbox-prev { left: 22px; top: 50%; transform: translateY(-50%); }
+   .custom-lightbox-next { right: 22px; top: 50%; transform: translateY(-50%); }
+   .custom-lightbox-count {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+   }
+   @media (max-width: 991px) { .image-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+   @media (max-width: 575px) {
+      .image-grid { grid-template-columns: 1fr; }
+      .gallery-heading h1 { font-size: 26px; letter-spacing: 3px; }
+      .custom-lightbox { padding: 56px 18px; }
+      .custom-lightbox-image { max-width: calc(100vw - 36px); max-height: calc(100vh - 128px); }
+      .custom-lightbox-prev { left: 8px; }
+      .custom-lightbox-next { right: 8px; }
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover"><div class="simpleParallax">{% if banner and banner.banner_image %}<img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">{% else %}<img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Photo Gallery" class="cover-parallax">{% endif %}</div></div>
+   <div class="page_header_content"><div class="auto-container"><div class="row"><div class="col-md-12"><div class="banner_title_inner"><div class="title_page">{{ banner.title|default:"Photo Gallery" }}</div></div></div><div class="col-lg-12"><div class="breadcrumbs creote"><ul class="breadcrumb m-auto"><li><a href="{% url 'home' %}">Home</a></li><li><a href="{% url 'photo_gallery' %}">Photo Gallery</a></li><li class="active">{{ album.title }}</li></ul></div></div></div></div></div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="photo-detail-section">
+      <div class="container">
+         <div class="gallery-heading"><h1>{{ album.title }}</h1><span class="line"></span></div>
+         <div class="image-grid">
+            {% for image in images %}
+            <a class="image-card js-gallery-image" href="{{ image.image.url }}" data-index="{{ forloop.counter0 }}">
+               <img src="{{ image.image.url }}" alt="{{ album.title }}">
+            </a>
+            {% empty %}
+            <p class="text-center">No images have been added to this album yet.</p>
+            {% endfor %}
+         </div>
+      </div>
+   </section>
+</div>
+
+<div class="custom-lightbox" id="customGalleryLightbox" aria-hidden="true">
+   <div class="custom-lightbox-count" id="customGalleryCount"></div>
+   <button class="custom-lightbox-btn custom-lightbox-close" type="button" id="customGalleryClose" aria-label="Close">&times;</button>
+   <button class="custom-lightbox-btn custom-lightbox-prev" type="button" id="customGalleryPrev" aria-label="Previous">&#8249;</button>
+   <img class="custom-lightbox-image" id="customGalleryImage" src="" alt="{{ album.title }}">
+   <button class="custom-lightbox-btn custom-lightbox-next" type="button" id="customGalleryNext" aria-label="Next">&#8250;</button>
+</div>
+
+<script>
+   (function () {
+      const links = Array.from(document.querySelectorAll(".js-gallery-image"));
+      const modal = document.getElementById("customGalleryLightbox");
+      const image = document.getElementById("customGalleryImage");
+      const count = document.getElementById("customGalleryCount");
+      const closeBtn = document.getElementById("customGalleryClose");
+      const prevBtn = document.getElementById("customGalleryPrev");
+      const nextBtn = document.getElementById("customGalleryNext");
+      let currentIndex = 0;
+
+      function showImage(index) {
+         if (!links.length) return;
+         currentIndex = (index + links.length) % links.length;
+         image.src = links[currentIndex].href;
+         count.textContent = (currentIndex + 1) + " / " + links.length;
+      }
+
+      function openLightbox(index) {
+         showImage(index);
+         modal.classList.add("is-open");
+         modal.setAttribute("aria-hidden", "false");
+         document.body.style.overflow = "hidden";
+      }
+
+      function closeLightbox() {
+         modal.classList.remove("is-open");
+         modal.setAttribute("aria-hidden", "true");
+         image.src = "";
+         document.body.style.overflow = "";
+      }
+
+      links.forEach(function (link, index) {
+         link.addEventListener("click", function (event) {
+            event.preventDefault();
+            openLightbox(index);
+         });
+      });
+
+      closeBtn.addEventListener("click", closeLightbox);
+      prevBtn.addEventListener("click", function () { showImage(currentIndex - 1); });
+      nextBtn.addEventListener("click", function () { showImage(currentIndex + 1); });
+
+      modal.addEventListener("click", function (event) {
+         if (event.target === modal) closeLightbox();
+      });
+
+      document.addEventListener("keydown", function (event) {
+         if (!modal.classList.contains("is-open")) return;
+         if (event.key === "Escape") closeLightbox();
+         if (event.key === "ArrowLeft") showImage(currentIndex - 1);
+         if (event.key === "ArrowRight") showImage(currentIndex + 1);
+      });
+   })();
+</script>
+{% endblock content %}

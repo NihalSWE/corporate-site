@@ -1,0 +1,196 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    {% include "includes/alert.html" %}
+
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="mb-1">Sister Concern</h4>
+                <p class="text-muted mb-0">Manage the companies shown in the frontend navbar and detail page.</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSisterConcernModal">
+                <i class="fa fa-plus"></i> Add Sister Concern
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Logo</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Link</th>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for concern in sister_concerns %}
+                        <tr>
+                            <td>
+                                {% if concern.display_image %}
+                                <img src="{{ concern.display_image.url }}" width="90" height="88" class="rounded border bg-white p-1" style="object-fit:cover;" alt="{{ concern.title }}">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if concern.logo %}
+                                <img src="{{ concern.logo.url }}" width="120" class="rounded border bg-white p-1" alt="{{ concern.title }}">
+                                {% endif %}
+                            </td>
+                            <td>{{ concern.title }}</td>
+                            <td style="max-width: 360px;">{{ concern.description|truncatechars:120 }}</td>
+                            <td>
+                                {% if concern.link %}
+                                <a href="{{ concern.link }}" target="_blank" rel="noopener">{{ concern.link|truncatechars:36 }}</a>
+                                {% else %}
+                                <span class="text-muted">No link</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ concern.sort_order }}</td>
+                            <td>
+                                {% if concern.is_active %}
+                                <span class="badge badge-light-success">Active</span>
+                                {% else %}
+                                <span class="badge badge-light-danger">Hidden</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editSisterConcernModal{{ concern.id }}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                                <form method="POST" class="d-inline" onsubmit="return confirm('Delete this sister concern?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ concern.id }}">
+                                    <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        <div class="modal fade" id="editSisterConcernModal{{ concern.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Edit Sister Concern</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="edit">
+                                        <input type="hidden" name="id" value="{{ concern.id }}">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-8 mb-3">
+                                                    <label class="form-label">Title</label>
+                                                    <input type="text" name="title" class="form-control" value="{{ concern.title }}" required>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label">Order</label>
+                                                    <input type="number" name="sort_order" class="form-control" value="{{ concern.sort_order }}">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Description</label>
+                                                <textarea name="description" class="form-control" rows="5" required>{{ concern.description }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Link</label>
+                                                <input type="url" name="link" class="form-control" value="{{ concern.link|default:'' }}" placeholder="https://example.com">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Logo Image</label><br>
+                                                {% if concern.logo %}
+                                                <img src="{{ concern.logo.url }}" width="160" class="rounded border bg-white p-2 mb-2" alt="{{ concern.title }}">
+                                                {% endif %}
+                                                <input type="file" name="logo" class="form-control" accept="image/*">
+                                                <small class="text-muted">Optional. Leave empty to keep the current logo.</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Display Image</label><br>
+                                                {% if concern.display_image %}
+                                                <img src="{{ concern.display_image.url }}" width="160" height="156" class="rounded border bg-white p-2 mb-2" style="object-fit:cover;" alt="{{ concern.title }}">
+                                                {% endif %}
+                                                <input type="file" name="display_image" class="form-control" accept="image/*">
+                                                <small class="text-muted">Required size: 360 x 350 pixels. Max size: 50KB. Leave empty to keep current image.</small>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive{{ concern.id }}" {% if concern.is_active %}checked{% endif %}>
+                                                <label class="form-check-label" for="isActive{{ concern.id }}">Show on frontend</label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">No sister concerns have been added yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addSisterConcernModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sister Concern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Logo Image</label>
+                        <input type="file" name="logo" class="form-control" accept="image/*">
+                        <small class="text-muted">Optional.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Display Image</label>
+                        <input type="file" name="display_image" class="form-control" accept="image/*" required>
+                        <small class="text-muted">Required size: 360 x 350 pixels. Max size: 50KB.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link</label>
+                        <input type="url" name="link" class="form-control" placeholder="https://example.com">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_active" class="form-check-input" id="addIsActive" checked>
+                        <label class="form-check-label" for="addIsActive">Show on frontend</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">Save Sister Concern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

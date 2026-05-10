@@ -1,0 +1,450 @@
+{% load static %}
+{% load sass_tags %}
+<!DOCTYPE html>
+<html lang="en" dir="{{ layout|default:'ltr' }}">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ breadcrumb.title|default:"Dashboard" }}</title>
+    <link rel="icon" href="{% static 'assets/images/logo/logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/fontawesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/scrollbar.css' %}">
+    {% block css %}{% endblock css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/style.scss' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/responsive.scss' %}">
+    <style>
+      .custom-admin-shell .page-wrapper.compact-wrapper .page-header,
+      .custom-admin-shell .page-header {
+        left: 265px;
+        margin-left: 0;
+        width: calc(100% - 265px);
+        height: 72px;
+        min-height: 72px;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      }
+
+      .custom-admin-shell .page-header .header-wrapper {
+        height: 72px;
+        min-height: 72px;
+        width: 100%;
+        margin: 0;
+        padding: 0 30px;
+        display: flex;
+        align-items: center;
+      }
+
+      .custom-admin-shell .page-header .header-logo-wrapper {
+        display: none;
+      }
+
+      .custom-admin-shell .page-header .left-header {
+        flex: 0 0 auto;
+        max-width: none;
+      }
+
+      .custom-admin-shell .page-header .nav-right {
+        flex: 1 1 auto;
+        max-width: none;
+        width: auto;
+        margin-left: auto;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .custom-admin-shell .page-header .nav-right > ul,
+      .custom-admin-shell .page-header .nav-menus {
+        width: auto;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 16px;
+      }
+
+      .custom-admin-shell .page-header .profile-media .media-body span,
+      .custom-admin-shell .page-header .profile-media .media-body p {
+        display: block;
+        white-space: nowrap;
+      }
+
+      .custom-admin-shell .custom-user-menu {
+        position: relative;
+        padding: 0;
+      }
+
+      .custom-admin-shell .custom-user-trigger {
+        height: 38px;
+        border: 0;
+        background: transparent;
+        color: #2f3349;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0 12px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .custom-admin-shell .custom-user-trigger:hover {
+        background: #f4f3ff;
+        color: var(--theme-default);
+      }
+
+      .custom-admin-shell .header-user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-grid;
+        place-items: center;
+        background: #eef4ff;
+        color: var(--theme-default);
+        overflow: hidden;
+        flex: 0 0 auto;
+      }
+
+      .custom-admin-shell .header-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .custom-admin-shell .header-user-avatar svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .custom-admin-shell .custom-user-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        min-width: 240px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+        z-index: 20;
+      }
+
+      .custom-admin-shell .custom-user-menu:hover .custom-user-dropdown,
+      .custom-admin-shell .custom-user-menu:focus-within .custom-user-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .custom-admin-shell .custom-user-card {
+        background: #fff;
+        border: 1px solid #edf0f7;
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+        padding: 16px;
+      }
+
+      .custom-admin-shell .custom-user-card:before {
+        content: "";
+        position: absolute;
+        top: -7px;
+        right: 18px;
+        width: 14px;
+        height: 14px;
+        background: #fff;
+        border-left: 1px solid #edf0f7;
+        border-top: 1px solid #edf0f7;
+        transform: rotate(45deg);
+      }
+
+      .custom-admin-shell .custom-menu-link {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #344054;
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 8px 10px;
+      }
+
+      .custom-admin-shell .custom-menu-link:hover {
+        background: #f4f3ff;
+        color: var(--theme-default);
+      }
+
+      .custom-admin-shell .custom-menu-link svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .custom-admin-shell .custom-logout-btn {
+        margin-top: 8px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        border-radius: 6px;
+        background: var(--theme-default);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .custom-admin-shell .custom-logout-btn:hover {
+        color: #fff;
+        opacity: 0.92;
+      }
+
+      .custom-admin-shell .custom-logout-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .custom-admin-shell .logo-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 92px;
+      }
+
+      .custom-admin-shell .admin-logo-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .custom-admin-shell .admin-logo-link img {
+        width: 190px;
+        max-width: 88%;
+        height: auto;
+        display: block;
+      }
+
+      .custom-admin-shell .page-body-wrapper .page-body {
+        margin-top: 72px;
+      }
+
+      .custom-admin-shell .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links {
+        padding: 20px 0 0;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-main-title {
+        margin: 0;
+        padding: 0 20px 8px;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-main-title h6 {
+        color: #777b90;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.2;
+        letter-spacing: 0;
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-list {
+        position: relative;
+        margin: 0;
+        padding: 0;
+      }
+
+      .custom-admin-shell .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-link,
+      .custom-admin-shell .sidebar-wrapper .sidebar-link {
+        min-height: 46px;
+        height: 46px;
+        margin: 0;
+        padding: 0 20px !important;
+        border-radius: 0;
+        background: transparent;
+        color: #8d91a6;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-link span {
+        color: inherit !important;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .admin-menu-icon {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #6f7588;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .admin-menu-icon svg {
+        width: 23px;
+        height: 23px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-link:hover,
+      .custom-admin-shell .sidebar-wrapper .sidebar-link.active {
+        background: #f0efff !important;
+        color: var(--theme-default) !important;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-link:hover .admin-menu-icon,
+      .custom-admin-shell .sidebar-wrapper .sidebar-link.active .admin-menu-icon {
+        color: var(--theme-default);
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-link.active:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 46px;
+        border-radius: 6px 0 0 6px;
+        background: var(--theme-default);
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-submenu,
+      .custom-admin-shell .sidebar-wrapper .menu-content {
+        display: none !important;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-list.is-open > .sidebar-submenu,
+      .custom-admin-shell .sidebar-wrapper .sidebar-list.is-open > .menu-content {
+        display: block !important;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-submenu {
+        margin: 0;
+        padding: 4px 0 10px 54px;
+        list-style: none;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-submenu li a {
+        display: block;
+        color: #9a9eb0;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.4;
+        padding: 7px 0;
+        text-decoration: none;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-submenu li a:hover,
+      .custom-admin-shell .sidebar-wrapper .sidebar-submenu li a.active {
+        color: var(--theme-default);
+      }
+
+      .custom-admin-shell .sidebar-wrapper .according-menu {
+        margin-left: auto;
+        color: #8d91a6;
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .custom-admin-shell .sidebar-wrapper .sidebar-link.active .according-menu,
+      .custom-admin-shell .sidebar-wrapper .sidebar-link:hover .according-menu {
+        color: var(--theme-default);
+      }
+
+      .custom-admin-shell .datatable-init table.display:not(.dataTable) {
+        visibility: hidden;
+      }
+
+      .custom-admin-shell .datatable-init table.display.dataTable {
+        visibility: visible;
+      }
+
+      @media (max-width: 991px) {
+        .custom-admin-shell .page-wrapper.compact-wrapper .page-header,
+        .custom-admin-shell .page-header {
+          left: 0;
+          width: 100%;
+        }
+      }
+    </style>
+    {% block custom_css %}{% endblock custom_css %}
+  </head>
+  <body class="custom-admin-shell">
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      {% include "admin_panel/layout/header.html" %}
+      <div class="page-body-wrapper">
+        {% include "admin_panel/layout/sidebar.html" %}
+        <div class="page-body">
+          {% block content %}{% endblock content %}
+        </div>
+        {% include "admin_panel/layout/footer.html" %}
+      </div>
+    </div>
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    {% block scriptcontent %}{% endblock scriptcontent %}
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script>
+      $(function () {
+        const shell = $(".custom-admin-shell");
+        const dropdownTitles = shell.find(".sidebar-list > .sidebar-title").not(".link-nav");
+        const navTitles = shell.find(".sidebar-list > .sidebar-title.link-nav");
+
+        function setIcon(title, open) {
+          title.find(".according-menu").remove();
+          title.append('<div class="according-menu"><i class="fa-solid fa-angle-' + (open ? "down" : "right") + '"></i></div>');
+        }
+
+        function closeAll(exceptItem) {
+          shell.find(".sidebar-list.is-open").not(exceptItem).each(function () {
+            const item = $(this);
+            item.removeClass("is-open");
+            item.children(".sidebar-title").removeClass("active");
+            setIcon(item.children(".sidebar-title").first(), false);
+          });
+        }
+
+        shell.find(".sidebar-title").off("click");
+
+        dropdownTitles.each(function () {
+          const title = $(this);
+          const item = title.closest(".sidebar-list");
+          const open = item.hasClass("is-open");
+          item.toggleClass("is-open", open);
+          setIcon(title, open);
+        });
+
+        dropdownTitles.on("click", function (event) {
+          event.preventDefault();
+          const title = $(this);
+          const item = title.closest(".sidebar-list");
+          const shouldOpen = !item.hasClass("is-open");
+
+          closeAll(item);
+          item.toggleClass("is-open", shouldOpen);
+          title.toggleClass("active", shouldOpen);
+          setIcon(title, shouldOpen);
+        });
+      });
+    </script>
+  </body>
+</html>

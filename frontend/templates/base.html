@@ -1,0 +1,285 @@
+﻿{% load static%}
+<!DOCTYPE html>
+<html lang="en-US">
+
+<!-- Mirrored from themepanthers.com/html/creote-html/home-13.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 06 May 2026 03:55:44 GMT -->
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+   <title>Admiral Group</title>
+   
+   {% if site_favicon and site_favicon.image %}
+   <link rel="icon" href="{{ site_favicon.image.url }}" type="image/x-icon">
+   <link rel="shortcut icon" href="{{ site_favicon.image.url }}" type="image/x-icon">
+   {% else %}
+   <link rel="icon" href="{% static 'assets/images/favicon.ico' %}" type="image/x-icon">
+   {% endif %}
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Spartan%3A400%2C500%2C600%2C700%2C800%2C900%7CInter%3A300%2C400%2C500%2C600%2C700%2C800%2C900&amp;subset=latin%2Clatin-ext" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/swiper.min.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/jquery.fancybox.min.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/icomoon.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/flexslider.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/font-awesome.min.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/scss/elements/theme-css.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" id="creote-color-switcher-css" href="{% static 'assets/css/scss/elements/color-switcher/color.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/woocommerce-layout.css' %}" type="text/css" media="all" />
+   <link rel="stylesheet" href="{% static 'assets/css/woocommerce.css' %}" type="text/css" media="all" />
+   <style>
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu {
+         min-width: 280px;
+         padding: 12px;
+         border: 1px solid rgba(15, 23, 42, 0.06);
+         border-radius: 8px;
+         background: rgba(255, 255, 255, 0.98);
+         box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
+         overflow: visible;
+         transform: translateY(10px);
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu:before {
+         content: "";
+         position: absolute;
+         top: -7px;
+         left: 30px;
+         width: 14px;
+         height: 14px;
+         background: #fff;
+         border-left: 1px solid rgba(15, 23, 42, 0.06);
+         border-top: 1px solid rgba(15, 23, 42, 0.06);
+         transform: rotate(45deg);
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu:after {
+         content: "";
+         position: absolute;
+         left: 12px;
+         right: 12px;
+         top: 0;
+         height: 3px;
+         border-radius: 0 0 4px 4px;
+         background: var(--primary-color-one, #078586);
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu li {
+         border-bottom: 0;
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item {
+         color: #1f2a44 !important;
+         min-height: 42px;
+         display: flex;
+         align-items: center;
+         padding: 9px 14px;
+         border-radius: 6px;
+         font-size: 15px;
+         font-weight: 600;
+         white-space: nowrap;
+         background: transparent !important;
+         transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item:before {
+         content: "";
+         width: 6px;
+         height: 6px;
+         border-radius: 50%;
+         margin-right: 10px;
+         background: rgba(7, 133, 134, 0.24);
+         transition: background-color 0.18s ease, transform 0.18s ease;
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item:hover {
+         background: rgba(7, 133, 134, 0.08) !important;
+         color: var(--primary-color-one, #078586) !important;
+         transform: translateX(2px);
+      }
+
+      .header_v13 .navigation_menu .navbar_nav > li > .dropdown-menu .dropdown-item:hover:before {
+         background: var(--primary-color-one, #078586);
+         transform: scale(1.12);
+      }
+   </style>
+   {% block custom_css %}
+  
+   {% endblock custom_css %}
+</head>
+
+<body class="home theme-creote page-home-default-one">
+   <div id="page" class="page_wapper hfeed site">
+      <div id="wrapper_full" class="content_all_warpper">
+         <!---page-header---->
+         <!---preloader-->
+         <div class="preloader-wrap">
+            <div class="preloader" style="background-image:url({% static 'assets/images/preloader.gif' %})">
+            </div>
+            <div class="overlay"></div>
+         </div>
+         <!--preloader end-->
+          <!-- header area start -->
+    {% include "partial/header.html" %}
+    <!-- header area end -->
+         <!--===============PAGE CONTENT==============-->
+         <!--===============PAGE CONTENT==============-->
+         {% block content %}{% endblock content %}
+         <!--===============PAGE CONTENT==============-->
+         <!--===============PAGE CONTENT==============-->
+      </div>
+      <!---==============footer start =================-->
+      {% include "partial/footer.html" %}
+      <!---==============mobile menu =================-->
+      <div class="crt_mobile_menu">
+         <div class="menu-backdrop"></div>
+         <nav class="menu-box">
+            <div class="close-btn"><i class="icon-close"></i></div>
+            <form role="search" method="get" action="#">
+               <input type="search" class="search" placeholder="Search..." value="" name="s" title="Search" />
+               <button type="submit" class="sch_btn"> <i class="icon-search"></i></button>
+            </form>
+            <div class="menu-outer">
+               <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+            </div>
+         </nav>
+      </div>
+      <!---==============mobile menu end =================-->
+      <!---==============search popup =================-->
+      <div id="search-popup" class="search-popup">
+         <div class="close-search"><i class="fa fa-times"></i></div>
+         <div class="popup-inner">
+            <div class="overlay-layer"></div>
+            <div class="search-form">
+               <fieldset>
+                  <form role="search" method="get" action="#">
+                     <input type="search" class="search" placeholder="Search..." value="" name="s" title="Search" />
+                     <button type="submit" class="sch_btn"> <i class="icon-search"></i></button>
+                  </form>
+               </fieldset>
+            </div>
+         </div>
+      </div>
+      <!---==============search popup end =================-->
+      <!---==============modal popup =================-->
+      <div class="modal_popup one">
+         <div class="modal-popup-inner">
+            <div class="close-modal"><i class="fa fa-times"></i></div>
+            <div class="modal_box">
+               <div class="row">
+                  <div class="col-lg-5 col-md-12 form_inner">
+                     <div class="form_content">
+                  
+                            
+                           <form class="contact-form" method="post" action="{% url 'contact' %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                              <p>
+                                 <label> Your name<br />
+                                   <input type="text" name="name" value="" size="40"   aria-required="true" aria-invalid="false" placeholder="Enter Your Name" required /> 
+                                   <br />
+                                    <i class="fa fa-user"></i><br />
+                                 </label>
+                              </p>
+                              <p><label> Your email<br />
+                                  <input type="email" name="email" value="" size="40" aria-required="true" aria-invalid="false"  placeholder="Enter Your Email" required />
+                                  <br />
+                                 <i class="fa fa-envelope"></i><br />
+                                 </label>
+                              </p>
+                              <p>
+                                 <label> Subject<br />
+                                   <input type="text" name="subject" value="" size="40" aria-invalid="false"  placeholder="Enter Your Subject" /> 
+                                   <br />
+                                    <i class="fa fa-folder"></i><br />
+                                 </label>
+                              </p>
+                              <p>
+                                 <label> Your message (optional)<br />
+                                    <textarea name="message"  cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea"  aria-invalid="false" placeholder="Enter Your Message" required></textarea> 
+                                    <br />
+                                    <i class="fa fa-comments"></i><br />
+                                 </label>
+                              </p>
+                              <p><input type="submit" value="Submit" /></p>
+                           
+                           </form>
+                    
+                     </div>
+                  </div>
+                  <div class="col-lg-7 col-md-12 about_company_inner">
+                     <div class="abt_content">
+                        <div class="logo">
+                           {% if site_logo and site_logo.image %}
+                           <img src="{{ site_logo.image.url }}" alt="img" class="company_logo_modal">
+                           {% else %}
+                           <img src="{% static 'assets/images/logo-default.png' %}" alt="img" class="company_logo_modal">
+                           {% endif %}
+                        </div>
+                        <div class="text">
+                           {% if site_about.description %}
+                           <div class="modal-about-text">{{ site_about.description|safe }}</div>
+                           {% else %}
+                           <p>We provide dependable web, software, and digital solutions with practical support for every client.</p>
+                           {% endif %}
+                           <a href="{% url 'aboutUs' %}">Read More</a>
+                        </div>
+                        {% if modal_gallery_images %}
+                        <div class="post_contet_modal">
+                           <h2> Photo Gallery</h2>
+                           <div class="post_enable">
+                              {% for gallery_image in modal_gallery_images %}
+                              <div class="modal_post_grid">
+                                 <a href="{% url 'photo_gallery_detail' gallery_image.album.slug %}">
+                                    <img width="852" height="812" src="{{ gallery_image.image.url }}"
+                                       class="main_img wp-post-image" alt="{{ gallery_image.album.title|default:'Photo gallery' }}" />
+                                 </a>
+                              </div>
+                              {% endfor %}
+                           </div>
+                        </div>
+                        {% endif %}
+                        <div class="copright">
+                           {{ site_copyright }}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!---==============modal popup end=================-->
+   </div>
+   <!-- Back to top with progress indicator-->
+   <div class="prgoress_indicator">
+      <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+         <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+      </svg>
+   </div>
+      <!---========================== javascript ==========================-->
+      <script type="text/javascript" src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/jquery.fancybox.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/jQuery.style.switcher.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/jquery.flexslider-min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/color-scheme.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/owl.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/swiper.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/isotope.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/countdown.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/simpleParallax.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/appear.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/jquery.countTo.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/sharer.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/validation.js' %}"></script>
+      
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-CE0deH3Jhj6GN4YvdCFZS7DpbXexzGU"></script>
+      <script src="{% static 'assets/js/gmaps.js' %}"></script>
+      <script src="{% static 'assets/js/map-helper.js' %}"></script>
+      
+      <script type="text/javascript" src="{% static 'assets/js/creote-extension.js' %}"></script>
+      {% block custom_js %}{% endblock custom_js %}
+      <!---========================== javascript ==========================-->
+  </body>
+  
+</html>

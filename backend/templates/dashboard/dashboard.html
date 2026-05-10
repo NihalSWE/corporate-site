@@ -1,0 +1,143 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block custom_css %}
+<style>
+  .dashboard-home-wrap {
+    padding: 28px 16px 60px;
+  }
+
+  .dashboard-welcome {
+    background: #fff;
+    border: 1px solid #edf0f7;
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+  }
+
+  .dashboard-welcome-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 28px 30px;
+    background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 72%);
+    border-bottom: 1px solid #edf0f7;
+  }
+
+  .dashboard-welcome-head h4 {
+    color: #1f2937;
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 0 6px;
+  }
+
+  .dashboard-welcome-head p {
+    color: #667085;
+    margin: 0;
+  }
+
+  .dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-actions .btn {
+    border-radius: 8px;
+    font-weight: 700;
+    min-height: 42px;
+  }
+
+  .dashboard-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding: 26px 30px 30px;
+  }
+
+  .dashboard-quick-card {
+    border: 1px solid #edf0f7;
+    border-radius: 12px;
+    padding: 20px;
+    background: #fff;
+  }
+
+  .dashboard-quick-card .icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #eef4ff;
+    color: var(--theme-default);
+    margin-bottom: 16px;
+  }
+
+  .dashboard-quick-card .icon-box svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .dashboard-quick-card h6 {
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 8px;
+  }
+
+  .dashboard-quick-card p {
+    color: #667085;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 991px) {
+    .dashboard-quick-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-welcome-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="dashboard-home-wrap">
+    <div class="dashboard-welcome">
+      <div class="dashboard-welcome-head">
+        <div>
+          <h4>Welcome, {{ request.user.username }}</h4>
+          <p>Manage your website content and admin users from this panel.</p>
+        </div>
+        <div class="dashboard-actions">
+          <a class="btn btn-primary" href="{% url 'users_home' %}">Manage Users</a>
+          <a class="btn btn-light" href="{% url 'profile_home' %}">My Profile</a>
+        </div>
+      </div>
+
+      <div class="dashboard-quick-grid">
+        <div class="dashboard-quick-card">
+          <div class="icon-box"><i data-feather="users"></i></div>
+          <h6>Users</h6>
+          <p>View all superusers, staff users, and normal users registered in the system.</p>
+        </div>
+        <div class="dashboard-quick-card">
+          <div class="icon-box"><i data-feather="user"></i></div>
+          <h6>Profile</h6>
+          <p>Update your account information and create new users when needed.</p>
+        </div>
+        <div class="dashboard-quick-card">
+          <div class="icon-box"><i data-feather="globe"></i></div>
+          <h6>Website</h6>
+          <p>Open the public website to review the frontend pages and content.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,146 @@
+{% load static %}        
+        
+        <div class="header_area" id="header_contents">
+            <header class="main-header header header_v13">
+
+               <section class="header_top">
+                  <div class="medium-container">
+                     <div class="header_top_inner">
+                        <div class="top_left">
+                           <ul class="top-links clearfix">
+                              <li>
+                                 <a href="{% url 'contact' %}" class="get_a_quote">{{ site_header_setting.quote_button_text|default:"Get a quote" }}</a>
+                              <li>
+                              <li>{{ site_header_setting.top_message|default:"Welcome to our consulting company." }}</li>
+                           </ul>
+                        </div>
+                        <div class="top_right text-right">
+                           <ul class="contact_info_two">
+                              <li class="single">
+                                 <p> <span class="icon-telephone"></span> <a href="tel:{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+8801958666999{% endif %}">{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+880-1958-666999{% endif %}</a>
+                                 </p>
+                              </li>
+                              <li class="single">
+                                 <p><span class="icon-mail"></span><a href="mailto:{% if site_contact and site_contact.email %}{{ site_contact.email }}{% else %}support@iglweb.com{% endif %}">{% if site_contact and site_contact.email %}{{ site_contact.email }}{% else %}support@iglweb.com{% endif %}</a>
+                                 </p>
+                              </li>
+                              <li class="single">
+                                 <p> <span class="icon-location2"></span>
+                                    {% if site_contact and site_contact.address %}{{ site_contact.address }}{% else %}House # 33A Road 4, Dhaka 1205{% endif %} </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+               <section class="navbar_outer get_sticky_header">
+                  <div class="medium-container">
+                     <nav class="inner_box">
+                        <div class="header_logo_box">
+                           <a href="{% url 'home' %}" class="logo navbar-brand">
+                              {% if site_logo and site_logo.image %}
+                              <img src="{{ site_logo.image.url }}" alt="IGL Web Ltd." class="logo_default">
+                              <img src="{{ site_logo.image.url }}" alt="IGL Web Ltd." class="logo__sticky">
+                              {% else %}
+                              <img src="{% static 'assets/images/images_8.png' %}" alt="IGL Web Ltd." class="logo_default">
+                              <img src="{% static 'assets/images/logo-default.png' %}" alt="IGL Web Ltd." class="logo__sticky">
+                              {% endif %}
+                           </a>
+                        </div>
+                        <div class="navbar_togglers hamburger_menu">
+                           <span class="line"></span>
+                           <span class="line"></span>
+                           <span class="line"></span>
+                        </div>
+                        <div class="header_content header_content_collapse">
+
+                           <div class="header_menu_box">
+                              <div class="navigation_menu">
+                                 <ul id="myNavbar" class="navbar_nav">
+                                    
+                                    <li class="menu-item nav-item">
+                                       <a href="{% url 'home' %}" class="nav-link">
+                                          <span>Home</span>
+                                       </a>
+                                    </li>
+
+                                    <li class="menu-item nav-item">
+                                       <a href="{% url 'aboutUs' %}" class="nav-link">
+                                          <span>About Us</span>
+                                       </a>
+                                    </li>
+
+                                    <li class="menu-item nav-item">
+                                       <a href="{% url 'ourteam' %}" class="nav-link">
+                                          <span>Our Team</span>
+                                       </a>
+                                    </li>
+
+                                    <li class="menu-item menu-item-has-children dropdown nav-item">
+                                       <a href="#" class="dropdown-toggle nav-link">
+                                          <span>Gallery</span>
+                                       </a>
+                                       <ul class="dropdown-menu">
+                                          <li class="menu-item nav-item">
+                                             <a href="{% url 'video_gallery' %}" class="dropdown-item nav-link">
+                                                <span>Video Gallery</span>
+                                             </a>
+                                          </li>
+                                          <li class="menu-item nav-item">
+                                             <a href="{% url 'photo_gallery' %}" class="dropdown-item nav-link">
+                                                <span>Photo Gallery</span>
+                                             </a>
+                                          </li>
+                                       </ul>
+                                    </li>
+                                    
+                                    <li class="menu-item menu-item-has-children dropdown nav-item">
+                                       <a href="#" class="dropdown-toggle nav-link">
+                                          <span>Sister Concern</span>
+                                       </a>
+                                       <ul class="dropdown-menu">
+                                          {% for concern in nav_sister_concerns %}
+                                          <li class="menu-item nav-item">
+                                             <a href="{% url 'sister_concern_detail' concern.slug %}" class="dropdown-item nav-link">
+                                                <span>{{ concern.title }}</span>
+                                             </a>
+                                          </li>
+                                          {% empty %}
+                                          <li class="menu-item nav-item">
+                                             <a href="#" class="dropdown-item nav-link">
+                                                <span>No sister concern added</span>
+                                             </a>
+                                          </li>
+                                          {% endfor %}
+                                       </ul>
+                                    </li>
+
+
+                                    <li class="menu-item nav-item">
+                                       <a href="{% url 'contact' %}" class="nav-link">
+                                          <span>Contact</span>
+                                       </a>
+                                    </li>
+
+                                 </ul>
+                              </div>
+                           </div>
+                           <ul class="navbar_right navbar_nav ">
+                              <li>
+                                 <button type="button" class="search-toggler"><i class="icon-search"></i></button>
+                              </li>
+                              <li>
+                                 <button type="button" class="contact-toggler"><i class="icon-menu1"></i></button>
+                              </li>
+
+                           </ul>
+                        </div>
+
+                     </nav>
+
+
+                  </div>
+
+               </section>
+            </header>
+            </div>

@@ -1,0 +1,39 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h3>Video Gallery Banner</h3>
+          <p class="text-muted mb-0">Controls the page header image and title on the Video Gallery page.</p>
+        </div>
+        <div class="card-body">
+          {% include "includes/alert.html" %}
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Title</label>
+              <input class="form-control" name="title" value="{{ banner.title|default:'Video Gallery' }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Image</label>
+              <input class="form-control" type="file" name="banner_image" accept="image/*" {% if not banner %}required{% endif %}>
+              <small class="text-muted">Suggested size: 1907 x 323 pixels. Max size: 100KB.</small>
+              {% if banner and banner.banner_image %}
+              <div class="mt-3"><img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" style="max-width: 320px; border-radius: 6px;"></div>
+              {% endif %}
+            </div>
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_active" {% if banner.is_active or not banner %}checked{% endif %}>
+              <label class="form-check-label">Active</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save Banner</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

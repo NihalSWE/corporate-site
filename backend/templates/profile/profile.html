@@ -1,0 +1,331 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block custom_css %}
+<style>
+  .profile-page-wrap {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 34px 16px 60px;
+  }
+
+  .profile-form-card {
+    width: min(100%, 920px);
+    background: #fff;
+    border: 1px solid #edf0f7;
+    border-radius: 14px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+  }
+
+  .profile-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 26px 30px;
+    background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 70%);
+    border-bottom: 1px solid #edf0f7;
+  }
+
+  .profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .profile-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--theme-default);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    box-shadow: 0 12px 26px rgba(115, 102, 255, 0.28);
+  }
+
+  .profile-title h4 {
+    margin: 0 0 5px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .profile-title p {
+    margin: 0;
+    color: #667085;
+    font-size: 14px;
+  }
+
+  .profile-status {
+    border-radius: 999px;
+    background: #eef4ff;
+    color: var(--theme-default);
+    font-weight: 700;
+    padding: 8px 13px;
+    white-space: nowrap;
+  }
+
+  .profile-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .create-user-btn {
+    min-height: 40px;
+    border-radius: 8px;
+    font-weight: 700;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .profile-form-body {
+    padding: 30px;
+  }
+
+  .profile-form-card .form-label {
+    color: #344054;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .profile-form-card .form-control {
+    min-height: 48px;
+    border-color: #e4e7ec;
+    border-radius: 9px;
+    color: #1f2937;
+    box-shadow: none;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .profile-form-card .form-control:focus {
+    border-color: var(--theme-default);
+    box-shadow: 0 0 0 4px rgba(115, 102, 255, 0.12);
+  }
+
+  .profile-help-text {
+    color: #98a2b3;
+    font-size: 12px;
+    margin-top: 7px;
+  }
+
+  .profile-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 22px;
+    border-top: 1px solid #edf0f7;
+  }
+
+  .profile-actions .btn {
+    min-width: 132px;
+    min-height: 42px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+
+  .create-user-modal .modal-content {
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+  }
+
+  .create-user-modal .modal-header {
+    border-bottom-color: #edf0f7;
+    padding: 22px 24px;
+  }
+
+  .create-user-modal .modal-title {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .create-user-modal .modal-body {
+    padding: 24px;
+  }
+
+  .create-user-modal .modal-footer {
+    border-top-color: #edf0f7;
+    padding: 18px 24px;
+  }
+
+  .create-user-modal .form-label {
+    color: #344054;
+    font-weight: 700;
+  }
+
+  .create-user-modal .form-control {
+    min-height: 46px;
+    border-color: #e4e7ec;
+    border-radius: 9px;
+  }
+
+  @media (max-width: 767px) {
+    .profile-page-wrap {
+      padding: 20px 0 42px;
+    }
+
+    .profile-hero {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 22px;
+    }
+
+    .profile-hero-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .profile-form-body {
+      padding: 22px;
+    }
+
+    .profile-actions {
+      align-items: stretch;
+      flex-direction: column-reverse;
+    }
+
+    .profile-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="profile-page-wrap">
+    <div class="profile-form-card">
+      <div class="profile-hero">
+        <div class="profile-identity">
+          <div class="profile-avatar">{{ request.user.username|first }}</div>
+          <div class="profile-title">
+            <h4>{{ request.user.username }}</h4>
+            <p>{{ request.user.email|default:"Manage your account information" }}</p>
+          </div>
+        </div>
+        <div class="profile-hero-actions">
+          <button class="btn btn-primary create-user-btn" type="button" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            Create New User
+          </button>
+          <div class="profile-status">Account Profile</div>
+        </div>
+      </div>
+
+      <div class="profile-form-body">
+        {% include "includes/alert.html" %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="username">Username</label>
+              <input class="form-control" id="username" name="username" type="text" value="{{ request.user.username }}" required>
+              <div class="profile-help-text">This name appears in the admin header.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="email">Email</label>
+              <input class="form-control" id="email" name="email" type="email" value="{{ request.user.email }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="first_name">First Name</label>
+              <input class="form-control" id="first_name" name="first_name" type="text" value="{{ request.user.first_name }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="last_name">Last Name</label>
+              <input class="form-control" id="last_name" name="last_name" type="text" value="{{ request.user.last_name }}">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label" for="password">New Password</label>
+              <input class="form-control" id="password" name="password" type="password" placeholder="Leave blank to keep current password">
+              <div class="profile-help-text">Only enter a password if you want to change it.</div>
+            </div>
+            <div class="col-12">
+              <div class="profile-actions">
+              <a class="btn btn-light ms-2" href="{% url 'dashboard_home' %}">Cancel</a>
+                <button class="btn btn-primary" type="submit">Update Profile</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade create-user-modal" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="create_user">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="createUserModalLabel">Create New User</h5>
+            <p class="text-muted mb-0">Add a new user account.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="new-user-name">Name</label>
+              <input class="form-control" id="new-user-name" name="name" type="text" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="new-user-phone">Phone Number</label>
+              <input class="form-control" id="new-user-phone" name="phone_number" type="tel">
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="new-user-email">Email</label>
+              <input class="form-control" id="new-user-email" name="new_email" type="email" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="new-user-password">Password</label>
+              <input class="form-control" id="new-user-password" name="new_password" type="password" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="new-user-image">Image</label>
+              <input class="form-control" id="new-user-image" name="image" type="file" accept="image/*">
+              <div class="profile-help-text">Optional. Image must be 50KB or smaller.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script>
+  const newUserImageInput = document.getElementById("new-user-image");
+
+  if (newUserImageInput) {
+    newUserImageInput.addEventListener("change", function () {
+      const file = this.files[0];
+      const maxSize = 50 * 1024;
+
+      if (file && file.size > maxSize) {
+        alert("Image must be 50KB or smaller.");
+        this.value = "";
+      }
+    });
+  }
+</script>
+{% endblock scriptcontent %}

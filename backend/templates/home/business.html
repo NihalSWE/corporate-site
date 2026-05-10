@@ -1,0 +1,248 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block custom_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+  .business-editor-shell {
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .business-editor-shell .ql-toolbar {
+    border: 0;
+    border-bottom: 1px solid #e3e8ef;
+  }
+  .business-editor-shell .ql-container {
+    border: 0;
+    min-height: 128px;
+  }
+  .business-editor-shell .ql-editor {
+    min-height: 128px;
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h3>Home Business</h3>
+          <p class="text-muted mb-0">Controls the Our Business mission, values, and vision cards on the homepage.</p>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-5 mb-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Small Title</label>
+                  <small class="text-muted"><span data-count-for="small_title">0</span>/30</small>
+                </div>
+                <input class="form-control js-limited-field" name="small_title" maxlength="30" data-maxlength="30" value="{{ section.small_title|default:'Our Business' }}">
+              </div>
+              <div class="col-md-7 mb-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Title</label>
+                  <small class="text-muted"><span data-count-for="title">0</span>/40</small>
+                </div>
+                <input class="form-control js-limited-field" name="title" maxlength="40" data-maxlength="40" value="{{ section.title|default:'Stand Out From The Rest' }}" required>
+              </div>
+            </div>
+
+            {% for item in items %}
+            <div class="border rounded p-3 mb-3">
+              <input type="hidden" name="item_id_{{ forloop.counter }}" value="{% if item %}{{ item.id }}{% endif %}">
+              <h5 class="mb-3">Card {{ forloop.counter }}</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label fw-bold">Card Title</label>
+                    <small class="text-muted"><span data-count-for="item_title_{{ forloop.counter }}">0</span>/25</small>
+                  </div>
+                  <input class="form-control js-limited-field" name="item_title_{{ forloop.counter }}" maxlength="25" data-maxlength="25" value="{% if item %}{{ item.title }}{% elif forloop.counter == 1 %}Our Mission{% elif forloop.counter == 2 %}Our Core Values{% else %}Our Vision{% endif %}">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <label class="form-label fw-bold mb-0">Icon Image</label>
+                    <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" rel="noopener" class="small">Choose icon</a>
+                  </div>
+                  <input class="form-control" type="file" name="item_icon_{{ forloop.counter }}" accept="image/*">
+                  {% if item and item.icon %}
+                  <div class="mt-2"><img src="{{ item.icon.url }}" alt="{{ item.title }}" style="width:64px;height:64px;object-fit:contain;"></div>
+                  {% endif %}
+                  <small class="text-muted">Download an icon from the link, then upload it here.</small>
+                </div>
+              </div>
+              {% if forloop.counter == 2 %}
+              <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Short Description</label>
+                  <small class="text-muted"><span data-count-for="item_description_{{ forloop.counter }}">0</span>/120</small>
+                </div>
+                <div class="business-editor-shell">
+                  <div class="js-business-editor" id="item_description_editor_{{ forloop.counter }}" data-target="item_description_{{ forloop.counter }}" data-maxlength="120">{% if item %}{{ item.description }}{% else %}Equal blame belongs to those who fail in their duty through weakness of will which the same as saying.{% endif %}</div>
+                </div>
+                <textarea class="d-none js-business-editor-value" name="item_description_{{ forloop.counter }}" id="item_description_{{ forloop.counter }}"></textarea>
+              </div>
+              <div>
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Core Value Lines</label>
+                  <small class="text-muted"><span data-line-count-for="item_value_lines_{{ forloop.counter }}">0</span>/6 lines</small>
+                </div>
+                <textarea class="form-control js-line-limited-field" name="item_value_lines_{{ forloop.counter }}" rows="6" data-maxlines="6" placeholder="One value per line">{% if item %}{{ item.value_lines }}{% else %}Integrity
+Commitment to excellence
+Consumer focus
+Accountability
+Inclusiveness{% endif %}</textarea>
+                <small class="text-muted">You can save fewer than 6 lines, but not more than 6.</small>
+              </div>
+              {% else %}
+              <div>
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Description</label>
+                  <small class="text-muted"><span data-count-for="item_description_{{ forloop.counter }}">0</span>/500</small>
+                </div>
+                <div class="business-editor-shell">
+                  <div class="js-business-editor" id="item_description_editor_{{ forloop.counter }}" data-target="item_description_{{ forloop.counter }}" data-maxlength="500">{% if item %}{{ item.description }}{% else %}Equal blame belongs to those who fail in their duty through weakness of will which the same as saying.{% endif %}</div>
+                </div>
+                <textarea class="d-none js-business-editor-value" name="item_description_{{ forloop.counter }}" id="item_description_{{ forloop.counter }}"></textarea>
+              </div>
+              <input type="hidden" name="item_value_lines_{{ forloop.counter }}" value="">
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_active" {% if section.is_active or not section %}checked{% endif %}>
+              <label class="form-check-label">Active</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save Business Section</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+  (function () {
+    const form = document.querySelector(".theme-form");
+    const toolbarOptions = [
+      ["bold", "italic", "underline"],
+      [{ "list": "ordered" }, { "list": "bullet" }],
+      ["clean"]
+    ];
+
+    function getEditorText(editor) {
+      return editor.getText().replace(/\n$/, "");
+    }
+
+    function enforceEditorLimit(editor, maxLength, counter) {
+      const text = getEditorText(editor);
+      if (text.length > maxLength) {
+        const selection = editor.getSelection();
+        editor.deleteText(maxLength, text.length - maxLength, "silent");
+        if (selection) {
+          editor.setSelection(Math.min(selection.index, maxLength), 0, "silent");
+        }
+      }
+      if (counter) {
+        counter.textContent = Math.min(getEditorText(editor).length, maxLength);
+      }
+    }
+
+    document.querySelectorAll(".js-business-editor").forEach(function (editorElement) {
+      const target = document.getElementById(editorElement.dataset.target);
+      const maxLength = parseInt(editorElement.dataset.maxlength, 10);
+      const counter = document.querySelector('[data-count-for="' + editorElement.dataset.target + '"]');
+      const editor = new Quill(editorElement, {
+        theme: "snow",
+        modules: {
+          toolbar: toolbarOptions
+        },
+        placeholder: "Write description..."
+      });
+
+      function syncEditor() {
+        enforceEditorLimit(editor, maxLength, counter);
+        target.value = getEditorText(editor).trim();
+      }
+
+      editor.on("text-change", syncEditor);
+      syncEditor();
+    });
+
+    document.querySelectorAll(".js-limited-field").forEach(function (field) {
+      var limit = parseInt(field.dataset.maxlength || field.getAttribute("maxlength"), 10);
+      var counter = document.querySelector('[data-count-for="' + field.name + '"]');
+
+      function syncCount() {
+        if (field.value.length > limit) {
+          field.value = field.value.slice(0, limit);
+        }
+        if (counter) {
+          counter.textContent = field.value.length;
+        }
+      }
+
+      field.addEventListener("input", syncCount);
+      field.addEventListener("paste", function () {
+        setTimeout(syncCount, 0);
+      });
+      syncCount();
+    });
+
+    document.querySelectorAll(".js-line-limited-field").forEach(function (field) {
+      var limit = parseInt(field.dataset.maxlines, 10);
+      var counter = document.querySelector('[data-line-count-for="' + field.name + '"]');
+
+      function syncLineCount() {
+        var lines = field.value.split(/\r?\n/);
+        if (lines.length > limit) {
+          field.value = lines.slice(0, limit).join("\n");
+          lines = field.value.split(/\r?\n/);
+        }
+        var used = lines.filter(function (line) {
+          return line.trim().length > 0;
+        }).length;
+        if (counter) {
+          counter.textContent = used;
+        }
+      }
+
+      field.addEventListener("input", syncLineCount);
+      field.addEventListener("paste", function () {
+        setTimeout(syncLineCount, 0);
+      });
+      syncLineCount();
+    });
+
+    if (form) {
+      form.addEventListener("submit", function () {
+        document.querySelectorAll(".js-business-editor").forEach(function (editorElement) {
+          const quill = Quill.find(editorElement);
+          const target = document.getElementById(editorElement.dataset.target);
+          if (quill && target) {
+            target.value = getEditorText(quill).trim();
+          }
+        });
+      });
+    }
+  })();
+</script>
+{% endblock scriptcontent %}

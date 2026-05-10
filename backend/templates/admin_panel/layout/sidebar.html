@@ -1,0 +1,119 @@
+{% load static %}
+{% with current_url=request.resolver_match.url_name %}
+<div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+  <div>
+    <div class="logo-wrapper">
+      <a href="{% url 'dashboard_home' %}" class="admin-logo-link">
+        {% if site_logo and site_logo.image %}
+        <img src="{{ site_logo.image.url }}" alt="IGL Web Ltd.">
+        {% else %}
+        <img src="{% static 'assets/images/images_8.png' %}" alt="IGL Web Ltd.">
+        {% endif %}
+      </a>
+    </div>
+    <nav class="sidebar-main">
+      <ul class="sidebar-links" id="simple-bar">
+        <li class="back-btn">
+          <div class="mobile-back text-end">
+            <span>Back</span><i class="fa-solid fa-angle-right ps-2"></i>
+          </div>
+        </li>
+
+        <li class="sidebar-list">
+          <a class="sidebar-link sidebar-title link-nav {% if current_url == 'dashboard_home' %}active{% endif %}" href="{% url 'dashboard_home' %}">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Dashboards</span>
+          </a>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'banner' or current_url == 'home_about_media' or current_url == 'home_business' or current_url == 'home_services_section' or current_url == 'home_why_choose' or current_url == 'home_faq' or current_url == 'home_mailing_subscribers' or current_url == 'home_identity' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'banner' or current_url == 'home_about_media' or current_url == 'home_business' or current_url == 'home_services_section' or current_url == 'home_why_choose' or current_url == 'home_faq' or current_url == 'home_mailing_subscribers' or current_url == 'home_identity' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Home</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'banner' or current_url == 'home_about_media' or current_url == 'home_business' or current_url == 'home_services_section' or current_url == 'home_why_choose' or current_url == 'home_faq' or current_url == 'home_mailing_subscribers' or current_url == 'home_identity' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'banner' %}active{% endif %}" href="{% url 'banner' %}">Banner</a></li>
+            <li><a class="{% if current_url == 'home_about_media' %}active{% endif %}" href="{% url 'home_about_media' %}">About Media</a></li>
+            <li><a class="{% if current_url == 'home_business' %}active{% endif %}" href="{% url 'home_business' %}">Business</a></li>
+            <li><a class="{% if current_url == 'home_services_section' %}active{% endif %}" href="{% url 'home_services_section' %}">Services Text</a></li>
+            <li><a class="{% if current_url == 'home_why_choose' %}active{% endif %}" href="{% url 'home_why_choose' %}">Why Choose Us</a></li>
+            <li><a class="{% if current_url == 'home_faq' %}active{% endif %}" href="{% url 'home_faq' %}">FAQ</a></li>
+            <li><a class="{% if current_url == 'home_mailing_subscribers' %}active{% endif %}" href="{% url 'home_mailing_subscribers' %}">Mailing List</a></li>
+            <li><a class="{% if current_url == 'home_identity' %}active{% endif %}" href="{% url 'home_identity' %}">Branding</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'about_banner' or current_url == 'about_hero' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'about_banner' or current_url == 'about_hero' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>About Us</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'about_banner' or current_url == 'about_hero' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'about_banner' %}active{% endif %}" href="{% url 'about_banner' %}">Banner</a></li>
+            <li><a class="{% if current_url == 'about_hero' %}active{% endif %}" href="{% url 'about_hero' %}">Leaders Section</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'contact_banner' or current_url == 'contact_info_cards' or current_url == 'contact_messages' or current_url == 'contact_map' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'contact_banner' or current_url == 'contact_info_cards' or current_url == 'contact_messages' or current_url == 'contact_map' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Contact Us</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'contact_banner' or current_url == 'contact_info_cards' or current_url == 'contact_messages' or current_url == 'contact_map' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'contact_banner' %}active{% endif %}" href="{% url 'contact_banner' %}">Banner</a></li>
+            <li><a class="{% if current_url == 'contact_info_cards' %}active{% endif %}" href="{% url 'contact_info_cards' %}">Info Cards</a></li>
+            <li><a class="{% if current_url == 'contact_messages' %}active{% endif %}" href="{% url 'contact_messages' %}">Messages</a></li>
+            <li><a class="{% if current_url == 'contact_map' %}active{% endif %}" href="{% url 'contact_map' %}">Map</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'video_gallery_banner' or current_url == 'video_gallery_items' or current_url == 'photo_gallery_banner' or current_url == 'photo_gallery_items' or current_url == 'gallery_main' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'video_gallery_banner' or current_url == 'video_gallery_items' or current_url == 'photo_gallery_banner' or current_url == 'photo_gallery_items' or current_url == 'gallery_main' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Gallery</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'video_gallery_banner' or current_url == 'video_gallery_items' or current_url == 'photo_gallery_banner' or current_url == 'photo_gallery_items' or current_url == 'gallery_main' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'video_gallery_banner' %}active{% endif %}" href="{% url 'video_gallery_banner' %}">Video Banner</a></li>
+            <li><a class="{% if current_url == 'video_gallery_items' %}active{% endif %}" href="{% url 'video_gallery_items' %}">Video Gallery</a></li>
+            <li><a class="{% if current_url == 'photo_gallery_banner' %}active{% endif %}" href="{% url 'photo_gallery_banner' %}">Photo Banner</a></li>
+            <li><a class="{% if current_url == 'photo_gallery_items' or current_url == 'gallery_main' %}active{% endif %}" href="{% url 'photo_gallery_items' %}">Photo Gallery</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'sister_concern_banner' or current_url == 'sister_concern_items' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'sister_concern_banner' or current_url == 'sister_concern_items' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M6 11h12"></path><path d="M8 15h8"></path><path d="M10 19h4"></path></svg></span><span>Sister Concern</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'sister_concern_banner' or current_url == 'sister_concern_items' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'sister_concern_banner' %}active{% endif %}" href="{% url 'sister_concern_banner' %}">Banner</a></li>
+            <li><a class="{% if current_url == 'sister_concern_items' %}active{% endif %}" href="{% url 'sister_concern_items' %}">Sister Concern</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list {% if current_url == 'team_banner' or current_url == 'team_members' %}is-open{% endif %}">
+          <a class="sidebar-link sidebar-title {% if current_url == 'team_banner' or current_url == 'team_members' %}active{% endif %}" href="javascript:void(0)">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Our Team</span>
+            <div class="according-menu"><i class="fa-solid fa-angle-{% if current_url == 'team_banner' or current_url == 'team_members' %}down{% else %}right{% endif %}"></i></div>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a class="{% if current_url == 'team_banner' %}active{% endif %}" href="{% url 'team_banner' %}">Banner</a></li>
+            <li><a class="{% if current_url == 'team_members' %}active{% endif %}" href="{% url 'team_members' %}">Members</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list">
+          <a class="sidebar-link sidebar-title link-nav {% if current_url == 'users_home' %}active{% endif %}" href="{% url 'users_home' %}">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-5h5v5"></path></svg></span><span>Users</span>
+          </a>
+        </li>
+
+        <li class="sidebar-list">
+          <a class="sidebar-link sidebar-title link-nav" href="{% url 'home' %}">
+            <span class="admin-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c2.3 2.5 3.5 5.5 3.5 9s-1.2 6.5-3.5 9"></path><path d="M12 3c-2.3 2.5-3.5 5.5-3.5 9s1.2 6.5 3.5 9"></path></svg></span><span>View Website</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endwith %}

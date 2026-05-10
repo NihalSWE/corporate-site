@@ -1,0 +1,299 @@
+﻿{% load static %}
+<style>
+   .footer_nav_menu {
+      overflow: visible;
+   }
+
+   .footer_nav_menu > li {
+      position: relative;
+   }
+
+   .footer_nav_menu .footer_submenu {
+      display: none;
+      list-style: none;
+      margin: 8px 0 0 20px;
+      padding: 8px 0 4px;
+      border-left: 1px solid rgba(255, 255, 255, 0.18);
+   }
+
+   .footer_nav_menu li:hover > .footer_submenu,
+   .footer_nav_menu li:focus-within > .footer_submenu {
+      display: block;
+   }
+
+   .footer_nav_menu .footer_submenu li {
+      margin: 0 0 7px;
+      padding-left: 12px;
+   }
+
+   .footer_nav_menu .footer_submenu a {
+      color: rgba(255, 255, 255, 0.82) !important;
+      font-size: 14px;
+      line-height: 1.35;
+   }
+
+   .footer_nav_menu .footer_submenu a:hover {
+      color: var(--primary-color-one, #078586) !important;
+   }
+
+   .footer-subscribe-message {
+      margin-top: 12px;
+   }
+
+   .footer-subscribe-message .alert {
+      margin-bottom: 0;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-weight: 600;
+   }
+
+   .footer_copy_content a {
+      color: #ffffff !important;
+      font-weight: 700;
+      text-decoration: none;
+   }
+
+   .footer_copy_content a:hover,
+   .footer_copy_content a:focus {
+      color: #e8fffb !important;
+      text-decoration: underline;
+   }
+</style>
+<section class="newsteller style_one bg_dark_1">
+   <!--===============spacing==============-->
+   <div class="pd_top_40"></div>
+   <!--===============spacing==============-->
+   <div class="auto-container">
+      <div class="row align-items-center">
+         <div class="col-lg-6 col-md-12">
+            <div class="content">
+               <h2>Join Our Mailing List</h2>
+               <p>For receiving our news and updates in your inbox directly. </p>
+            </div>
+         </div>
+         <div class="col-lg-6 col-md-12">
+            <div class="item_scubscribe">
+               <div class="input_group">
+                  <form class="mc4wp-form" method="post" action="{% url 'home' %}" data-name="Subscibe">
+                     {% csrf_token %}
+                     <input type="hidden" name="form_type" value="mailing_subscription">
+                     <div class="mc4wp-form-fields">
+                        <input type="email" name="email" placeholder="Your email address" required="">
+                        <input type="submit" value="Subscription">
+                     </div>
+                  </form>
+                  {% if messages %}
+                  <div class="footer-subscribe-message">
+                     {% for message in messages %}
+                     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                     {% endfor %}
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!--===============spacing==============-->
+   <div class="pd_bottom_40"></div>
+   <!--===============spacing==============-->
+</section>
+
+
+
+<div class="footer_area thirteen" id="footer_contents">
+    <div class="footer_widgets_wrap bg_op_1" style="background: url({% static 'assets/images/footer-bg.jpg' %});">
+       <!--===============spacing==============-->
+       <div class="pd_top_80"></div>
+       <!--===============spacing==============-->
+       <div class="container">
+          <div class="row">
+             <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="footer_widgets about_company light_color">
+                   <div class="about_company_inner">
+                      <div class="footer_logo">
+                         <a href="{% url 'home' %}">
+                            {% if site_logo and site_logo.image %}
+                            <img src="{{ site_logo.image.url }}" class="img-fluid" alt="logo" />
+                            {% else %}
+                            <img src="{% static 'assets/images/images_8.png' %}" class="img-fluid" alt="logo" />
+                            {% endif %}
+                         </a>
+                         <!--===============spacing==============-->
+                         <div class="pd_bottom_30"></div>
+                         <!--===============spacing==============-->
+                      </div>
+                      <div class="content_box">
+                         <p class="color_white">
+                            Over 20 years of experience weâ€™ll ensure you always get the best guidance. We serve a
+                            clients at every level of their organization...
+                         </p>
+
+                      </div>
+                   </div>
+                   <!--===============spacing==============-->
+                   <div class="pd_bottom_10"></div>
+                   <!--===============spacing==============-->
+                   <div class="theme_btn_all color_one">
+                      <a href="#" class="theme-btn two color_white">
+                         Read More
+                      </a>
+                   </div>
+                   <!--===============spacing==============-->
+                   <div class="pd_bottom_40"></div>
+                   <!--===============spacing==============-->
+                   {% if site_contact and site_contact.facebook or site_contact and site_contact.youtube or site_whatsapp_url %}
+                   <div class="social_media_v_one style_three">
+                      <ul>
+                         {% if site_contact and site_contact.facebook %}
+                         <li>
+                            <a href="{{ site_contact.facebook }}" target="_blank" rel="noopener"> <span class="fa fa-facebook"></span>
+                               <small>facebook</small>
+                            </a>
+                         </li>
+                         {% endif %}
+                         {% if site_contact and site_contact.youtube %}
+                         <li>
+                            <a href="{{ site_contact.youtube }}" target="_blank" rel="noopener"> <span class="fa fa-youtube-play"></span>
+                               <small>youtube</small>
+                            </a>
+                         </li>
+                         {% endif %}
+                         {% if site_whatsapp_url %}
+                         <li>
+                            <a href="{{ site_whatsapp_url }}" target="_blank" rel="noopener"> <span class="fa fa-whatsapp"></span>
+                               <small>whatsapp</small>
+                            </a>
+                         </li>
+                         {% endif %}
+                      </ul>
+                   </div>
+                   {% endif %}
+                </div>
+             </div>
+
+             <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="footer_widgets wid_tit style_one">
+                   <div class="fo_wid_title">
+                      <h2>Essentials</h2>
+                   </div>
+                </div>
+                <!--===============spacing==============-->
+                <div class="pd_bottom_25"></div>
+                <!--===============spacing==============-->
+                <div class="footer_widgets clearfix">
+                   <ul class="list_items_new_box type_one footer_nav_menu">
+                      <li>
+                         <a href="{% url 'home' %}" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            Home
+                         </a>
+                      </li>
+                      <li>
+                         <a href="{% url 'aboutUs' %}" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            About Us
+                         </a>
+                      </li>
+                      <li>
+                         <a href="{% url 'ourteam' %}" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            Our Team
+                         </a>
+                      </li>
+                      <li>
+                         <a href="#" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            Gallery
+                         </a>
+                         <ul class="footer_submenu">
+                            <li><a href="{% url 'video_gallery' %}">Video Gallery</a></li>
+                            <li><a href="{% url 'photo_gallery' %}">Photo Gallery</a></li>
+                         </ul>
+                      </li>
+                      <li>
+                         <a href="#" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            Sister Concern
+                         </a>
+                         {% if nav_sister_concerns %}
+                         <ul class="footer_submenu">
+                            {% for concern in nav_sister_concerns %}
+                            <li><a href="{% url 'sister_concern_detail' concern.slug %}">{{ concern.title }}</a></li>
+                            {% endfor %}
+                         </ul>
+                         {% endif %}
+                      </li>
+                      <li>
+                         <a href="{% url 'contact' %}" class="color_white">
+                            <span class=" icon-right-arrow icon"></span>
+                            Contact
+                         </a>
+                      </li>
+                   </ul>
+                </div>
+             </div>
+             <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="footer_widgets wid_tit style_one">
+                   <div class="fo_wid_title">
+                      <h2>Contact Us</h2>
+                   </div>
+                </div>
+                <!--===============spacing==============-->
+                <div class="pd_bottom_25"></div>
+                <!--===============spacing==============-->
+                <div class="footer_contact_widget">
+                   <div class="contact_info_nbox type_one">
+                      <div class="single">
+                         <h6 class="color_white"> <span class="icon-location2 color_white"></span> Address </h6>
+                         <p class="color_white">{% if site_contact and site_contact.address %}{{ site_contact.address }}{% else %}House # 33A Road 4, Dhaka 1205{% endif %}</p>
+                      </div>
+                   </div>
+                   <!--===============spacing==============-->
+                   <div class="pd_bottom_20"></div>
+                   <!--===============spacing==============-->
+                   <div class="contact_info_nbox type_one">
+                      <div class="single">
+                         <h6 class="color_white"> <span class="icon-telephone color_white"></span> Phone </h6>
+                         <p><a href="tel:{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+8801958666999{% endif %}" class="color_white">{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+880-1958-666999{% endif %}</a></p>
+                      </div>
+                   </div>
+                   <!--===============spacing==============-->
+                   <div class="pd_bottom_20"></div>
+                   <!--===============spacing==============-->
+                   <div class="contact_info_nbox type_one">
+                      <div class="single">
+                         <h6 class="color_white"> <span class="icon-mail color_white"></span> Email</h6>
+                         <p><a href="mailto:{% if site_contact and site_contact.email %}{{ site_contact.email }}{% else %}support@iglweb.com{% endif %}" class="color_white">{% if site_contact and site_contact.email %}{{ site_contact.email }}{% else %}support@iglweb.com{% endif %}</a></p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+       <!--===============spacing==============-->
+       <div class="pd_bottom_50"></div>
+       <!--===============spacing==============-->
+    </div>
+    <div class="creote-footer-copyright bg_dark_1">
+       <!--===============spacing==============-->
+       <div class="pd_top_20"></div>
+       <!--===============spacing==============-->
+       <div class="container">
+          <div class="row text-center">
+             <div class="col-lg-12">
+                <div class="footer_copy_content color_white">
+                  {{ site_copyright }}
+                </div>
+             </div>
+
+          </div>
+       </div>
+       <!--===============spacing==============-->
+       <div class="pd_bottom_20"></div>
+       <!--===============spacing==============-->
+    </div>
+ </div>

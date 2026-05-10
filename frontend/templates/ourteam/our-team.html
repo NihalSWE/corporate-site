@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .team_box.style_one .member_image img {
+      width: 100%;
+      aspect-ratio: 354 / 373;
+      object-fit: cover;
+   }
+   .team_box.style_one .button_view {
+      display: none !important;
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover">
+      <div class="simpleParallax">
+         {% if banner and banner.banner_image %}
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         {% else %}
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Our Team" class="cover-parallax">
+         {% endif %}
+      </div>
+   </div>
+   <div class="page_header_content">
+      <div class="auto-container">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="banner_title_inner">
+                  <div class="title_page">{{ banner.title|default:"Our Team" }}</div>
+               </div>
+            </div>
+            <div class="col-lg-12">
+               <div class="breadcrumbs creote">
+                  <ul class="breadcrumb m-auto">
+                     <li><a href="{% url 'home' %}">Home</a></li>
+                     <li class="active">{{ banner.title|default:"Our Team" }}</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="team-section bg_light_1">
+      <div class="pd_top_90"></div>
+      <div class="container">
+         <div class="row">
+            <div class="col-lg-12">
+               <div class="title_all_box style_one text-center dark_color">
+                  <div class="title_sections">
+                     <div class="before_title">Dedicated Team</div>
+                     <h2>Professional Individuals</h2>
+                  </div>
+                  <div class="pd_bottom_20"></div>
+               </div>
+            </div>
+         </div>
+
+         <div class="row">
+            {% for member in team_members %}
+            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+               <div class="team_box style_one">
+                  <div class="team_box_outer">
+                     <div class="member_image">
+                        <img src="{{ member.image.url }}" alt="{{ member.name }}">
+                     </div>
+                     <div class="about_member">
+                        <div class="share_media">
+                           <ul class="first">
+                              <li class="text">Share</li>
+                              <li><i class="fa fa-share-alt"></i></li>
+                           </ul>
+                           <ul>
+                              <li class="shar_alt"><i class="fa fa-share-alt"></i></li>
+                              {% if member.facebook %}<li><a href="{{ member.facebook }}" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>{% endif %}
+                              {% if member.linkedin %}<li><a href="{{ member.linkedin }}" target="_blank" rel="noopener"><i class="fa fa-linkedin"></i></a></li>{% endif %}
+                              {% if member.twitter %}<li><a href="{{ member.twitter }}" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>{% endif %}
+                              {% if member.youtube %}<li><a href="{{ member.youtube }}" target="_blank" rel="noopener"><i class="fa fa-youtube-play"></i></a></li>{% endif %}
+                           </ul>
+                        </div>
+                        <div class="authour_details">
+                           <span>{{ member.designation }}</span>
+                           <h6>{{ member.name }}</h6>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            {% empty %}
+            <div class="col-lg-12">
+               <div class="text-center">
+                  <p>No team members have been added yet.</p>
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+      <div class="pd_bottom_70"></div>
+   </section>
+</div>
+{% endblock content %}

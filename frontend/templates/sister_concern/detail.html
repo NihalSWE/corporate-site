@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .sister-concern-page {
+      background: #ffffff;
+      padding: 54px 0 80px;
+   }
+
+   .sister-concern-card {
+      width: min(1216px, calc(100% - 32px));
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+      padding: 46px 48px 48px;
+   }
+
+   .sister-concern-title {
+      color: #417cff;
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin: 0 0 32px;
+      letter-spacing: 0;
+   }
+
+   .sister-concern-description {
+      color: #4d4d56;
+      font-size: 18px;
+      line-height: 1.8;
+      margin: 0 0 24px;
+      max-width: 1100px;
+   }
+
+   .sister-concern-flow:after {
+      content: "";
+      display: table;
+      clear: both;
+   }
+
+   .sister-concern-image {
+      float: right;
+      width: min(360px, 100%);
+      margin: 0 0 24px 34px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+   }
+
+   .sister-concern-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+   }
+
+   .sister-logo-box {
+      width: min(320px, 100%);
+      min-height: 78px;
+      border: 1px solid #e2e5ea;
+      border-radius: 7px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 22px;
+      margin: 22px 0 20px;
+      background: #fff;
+   }
+
+   .sister-logo-box img {
+      max-width: 100%;
+      max-height: 70px;
+      object-fit: contain;
+   }
+
+   .sister-visit-btn {
+      min-height: 58px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border-radius: 999px;
+      padding: 0 29px;
+      background: linear-gradient(90deg, #3382f6 0%, #7b39f2 100%);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 14px 28px rgba(72, 95, 238, 0.26);
+   }
+
+   .sister-visit-btn:hover {
+      color: #fff;
+      transform: translateY(-1px);
+   }
+
+   @media (max-width: 767px) {
+      .sister-concern-page {
+         padding: 30px 0 56px;
+      }
+
+      .sister-concern-card {
+         padding: 30px 20px 34px;
+      }
+
+      .sister-concern-title {
+         font-size: 30px;
+         margin-bottom: 22px;
+      }
+
+      .sister-concern-description {
+         font-size: 16px;
+         line-height: 1.7;
+      }
+
+      .sister-concern-image {
+         float: none;
+         margin: 0 0 24px;
+      }
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover">
+      <div class="simpleParallax">
+         {% if banner and banner.banner_image %}
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         {% else %}
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Sister Concern" class="cover-parallax">
+         {% endif %}
+      </div>
+   </div>
+   <div class="page_header_content">
+      <div class="auto-container">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="banner_title_inner">
+                  <div class="title_page">{{ banner.title|default:"Sister Concern" }}</div>
+               </div>
+            </div>
+            <div class="col-lg-12">
+               <div class="breadcrumbs creote">
+                  <ul class="breadcrumb m-auto">
+                     <li><a href="{% url 'home' %}">Home</a></li>
+                     <li class="active">{{ concern.title }}</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="sister-concern-page">
+      <div class="sister-concern-card">
+         <h1 class="sister-concern-title">{{ concern.title }}</h1>
+         <div class="sister-concern-flow">
+            {% if concern.display_image %}
+            <div class="sister-concern-image">
+               <img src="{{ concern.display_image.url }}" alt="{{ concern.title }}">
+            </div>
+            {% endif %}
+            <div class="sister-concern-description">{{ concern.description|linebreaksbr }}</div>
+         </div>
+
+         {% if concern.logo %}
+         <div class="sister-logo-box">
+            <img src="{{ concern.logo.url }}" alt="{{ concern.title }}">
+         </div>
+         {% endif %}
+
+         {% if concern.link %}
+         <a href="{{ concern.link }}" class="sister-visit-btn" target="_blank" rel="noopener">
+            Visit Site For More Info <i class="icon-right-arrow"></i>
+         </a>
+         {% endif %}
+      </div>
+   </section>
+</div>
+{% endblock content %}

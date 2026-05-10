@@ -1,0 +1,121 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  {% include "includes/alert.html" %}
+  <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <div>
+        <h4 class="mb-1">Photo Gallery</h4>
+        <p class="text-muted mb-0">Create thumbnail albums, then upload related images under each album. Images are optimized under 100KB.</p>
+      </div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAlbumModal"><i class="fa fa-plus"></i> Add Album</button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead><tr><th>Thumbnail</th><th>Title</th><th>Images</th><th>Order</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+          <tbody>
+            {% for album in albums %}
+            <tr>
+              <td>{% if album.thumbnail %}<img src="{{ album.thumbnail.url }}" width="120" class="rounded border" alt="{{ album.title }}">{% endif %}</td>
+              <td>{{ album.title }}</td>
+              <td>{{ album.images.count }}</td>
+              <td>{{ album.sort_order }}</td>
+              <td>{% if album.is_active %}<span class="badge badge-light-success">Active</span>{% else %}<span class="badge badge-light-danger">Hidden</span>{% endif %}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addImagesModal{{ album.id }}">Add Images</button>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editAlbumModal{{ album.id }}">Edit</button>
+                <form method="POST" class="d-inline" onsubmit="return confirm('Delete this album and all images?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="delete_album">
+                  <input type="hidden" name="id" value="{{ album.id }}">
+                  <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="6">
+                <div class="d-flex flex-wrap gap-2">
+                  {% for image in album.images.all %}
+                  <div class="position-relative">
+                    <img src="{{ image.image.url }}" width="86" height="62" class="rounded border" style="object-fit: cover;" alt="{{ album.title }}">
+                    <form method="POST" class="position-absolute top-0 end-0" onsubmit="return confirm('Delete this image?');">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete_image">
+                      <input type="hidden" name="id" value="{{ image.id }}">
+                      <button class="btn btn-xs btn-danger p-1" style="line-height: 1;">x</button>
+                    </form>
+                  </div>
+                  {% empty %}
+                  <span class="text-muted">No related images yet.</span>
+                  {% endfor %}
+                </div>
+              </td>
+            </tr>
+            <div class="modal fade" id="editAlbumModal{{ album.id }}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header"><h5 class="modal-title">Edit Album</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_album">
+                    <input type="hidden" name="id" value="{{ album.id }}">
+                    <div class="modal-body">
+                      <div class="mb-3"><label class="form-label">Title</label><input name="title" class="form-control" value="{{ album.title }}" required></div>
+                      <div class="mb-3"><label class="form-label">Thumbnail</label><input name="thumbnail" type="file" class="form-control" accept="image/*"><small class="text-muted">Leave empty to keep current thumbnail.</small></div>
+                      <div class="mb-3"><label class="form-label">Order</label><input name="sort_order" type="number" class="form-control" value="{{ album.sort_order }}"></div>
+                      <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="albumActive{{ album.id }}" {% if album.is_active %}checked{% endif %}><label class="form-check-label" for="albumActive{{ album.id }}">Show on frontend</label></div>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="addImagesModal{{ album.id }}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header"><h5 class="modal-title">Add Images to {{ album.title }}</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_images">
+                    <input type="hidden" name="album_id" value="{{ album.id }}">
+                    <div class="modal-body">
+                      <label class="form-label">Related Images</label>
+                      <input name="images" type="file" class="form-control" accept="image/*" multiple required>
+                      <small class="text-muted">You can select multiple images. Each image will be optimized under 100KB.</small>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">Upload Images</button></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No photo albums have been added yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addAlbumModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Add Photo Album</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_album">
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Title</label><input name="title" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Thumbnail Image</label><input name="thumbnail" type="file" class="form-control" accept="image/*" required></div>
+          <div class="mb-3"><label class="form-label">Order</label><input name="sort_order" type="number" class="form-control" value="0"></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="addAlbumActive" checked><label class="form-check-label" for="addAlbumActive">Show on frontend</label></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Album</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

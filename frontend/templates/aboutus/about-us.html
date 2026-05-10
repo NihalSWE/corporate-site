@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .about-video-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 80px;
+      background: rgba(12, 15, 20, 0.88);
+   }
+   .about-video-lightbox.is-open { display: flex; }
+   .about-video-lightbox-inner { width: min(980px, calc(100vw - 160px)); }
+   .about-video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+   }
+   .about-video-frame iframe,
+   .about-video-frame video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+   }
+   .about-video-fallback { margin-top: 16px; text-align: center; }
+   .about-video-fallback a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 4px;
+      background: #078586;
+      color: #fff;
+      font-weight: 700;
+   }
+   .about-video-fallback a:hover { color: #fff; background: #066f70; }
+   .about-video-close {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.46);
+      color: #fff;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+   }
+   .about-video-close:hover { background: rgba(0, 0, 0, 0.72); }
+   .about-flow-row {
+      display: block;
+   }
+   .about-flow-row:after {
+      content: "";
+      display: table;
+      clear: both;
+   }
+   .about-media-float {
+      float: right;
+      width: 50%;
+      padding-left: 32px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+   }
+   .about-content-flow {
+      float: none;
+      width: auto;
+      max-width: none;
+   }
+   .about-flow-content {
+      color: #555;
+      font-size: 17px;
+      line-height: 1.75;
+      text-align: justify;
+   }
+   .about-flow-content p {
+      margin-bottom: 24px;
+   }
+   .about-flow-action {
+      clear: both;
+      padding-top: 8px;
+   }
+   @media (max-width: 1199px) {
+      .about-media-float {
+         width: 48%;
+      }
+   }
+   @media (max-width: 991px) {
+      .about-media-float {
+         float: none;
+         width: 100%;
+         padding-left: 0;
+         margin-bottom: 32px;
+      }
+   }
+   @media (max-width: 575px) {
+      .about-video-lightbox { padding: 58px 18px; }
+      .about-video-lightbox-inner { width: 100%; }
+      .about-flow-content {
+         font-size: 15px;
+         line-height: 1.7;
+      }
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover">
+      <div class="simpleParallax">
+         {% if banner and banner.banner_image %}
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         {% else %}
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="About Us" class="cover-parallax">
+         {% endif %}
+      </div>
+   </div>
+   <div class="page_header_content">
+      <div class="auto-container">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="banner_title_inner">
+                  <div class="title_page">{{ banner.title|default:"About Us" }}</div>
+               </div>
+            </div>
+            <div class="col-lg-12">
+               <div class="breadcrumbs creote">
+                  <ul class="breadcrumb m-auto">
+                     <li><a href="{% url 'home' %}">Home</a></li>
+                     <li class="active">{{ banner.title|default:"About Us" }}</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="about-section">
+      <div class="pd_top_90"></div>
+      <div class="container">
+         <div class="row about-flow-row">
+            <div class="col-xl-6 col-lg-12 about-media-float">
+               <div class="image_boxes style_two">
+                  <img src="{% static 'assets/images/shape-1.png' %}" class="background_image" alt="shape">
+                  <div class="image one">
+                     {% if hero_section and hero_section.main_image %}
+                     <img src="{{ hero_section.main_image.url }}" class="img-fluid" alt="{{ hero_section.title }}">
+                     {% else %}
+                     <img src="{% static 'assets/images/about/about-6.png' %}" class="img-fluid" alt="about">
+                     {% endif %}
+                  </div>
+                  <div class="image two">
+                     {% if hero_section and hero_section.video_thumbnail %}
+                     <img src="{{ hero_section.video_thumbnail.url }}" class="img-fluid" alt="{{ hero_section.title }}">
+                     {% else %}
+                     <img src="{% static 'assets/images/about/about-7.png' %}" class="img-fluid" alt="video">
+                     {% endif %}
+                     <div class="video_box">
+                        <a href="{{ video_url|default:'#' }}" class="js-about-video-open" data-src="{{ video_url }}" data-original="{{ video_original_url }}" data-kind="{% if video_is_direct %}video{% else %}iframe{% endif %}"><i class="icon-play"></i></a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-xl-6 col-lg-12 about-content-flow">
+               <div class="about_content position-relative z_99">
+                  <div class="title_all_box style_one text-left dark_color">
+                     <div class="title_sections">
+                        <div class="before_title">{{ hero_section.small_title|default:"We are" }}</div>
+                        <h2>{{ hero_section.title|default:"Leaders in HR Solution" }}</h2>
+                     </div>
+                  </div>
+                  <div class="pd_bottom_15"></div>
+                  <div class="extra_content image_with_content dark_color">
+                     <div class="simple_image">
+                        {% if hero_section and hero_section.badge_image %}
+                        <img src="{{ hero_section.badge_image.url }}" alt="{{ hero_section.badge_text|default:'Badge' }}">
+                        {% else %}
+                        <img src="{% static 'assets/images/cuntry-1.png' %}" alt="country">
+                        {% endif %}
+                        <h2>{{ hero_section.badge_text|default:"Since 1998, Operating in Birmingham." }}</h2>
+                     </div>
+                  </div>
+                  <div class="pd_bottom_20"></div>
+                  <div class="about-flow-content">
+                     {% if hero_section and hero_section.description %}
+                     {{ hero_section.description|safe }}
+                     {% else %}
+                     <p>The great explorer of the truth, the master-builder of human happiness no one rejects dislikes avoids pleasure itself because it is pleasure but because know who do not those how to pursue pleasures rationally encounter consequences that are extremely painful desires to obtain.</p>
+                     {% endif %}
+                  </div>
+                  <div class="pd_bottom_25"></div>
+                  <div class="theme_btn_all color_one about-flow-action">
+                     <a href="{% url 'contact' %}" class="theme-btn five">Contact us<i class="icon-right-arrow"></i></a>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="pd_bottom_70"></div>
+   </section>
+</div>
+
+<div class="about-video-lightbox" id="aboutVideoLightbox" aria-hidden="true">
+   <button class="about-video-close" type="button" id="aboutVideoClose" aria-label="Close">&times;</button>
+   <div class="about-video-lightbox-inner">
+      <div class="about-video-frame" id="aboutVideoFrame"></div>
+      <div class="about-video-fallback" id="aboutVideoFallback">
+         <a href="#" target="_blank" rel="noopener">Open video in new tab</a>
+      </div>
+   </div>
+</div>
+
+<script>
+   (function () {
+      const openButton = document.querySelector(".js-about-video-open");
+      const modal = document.getElementById("aboutVideoLightbox");
+      const frame = document.getElementById("aboutVideoFrame");
+      const fallback = document.getElementById("aboutVideoFallback");
+      const fallbackLink = fallback.querySelector("a");
+      const closeButton = document.getElementById("aboutVideoClose");
+
+      function autoplayUrl(src) {
+         if (src.indexOf("youtube.com/embed/") !== -1 || src.indexOf("player.vimeo.com/video/") !== -1) {
+            return src + (src.indexOf("?") === -1 ? "?" : "&") + "autoplay=1";
+         }
+         if (src.indexOf("facebook.com/plugins/video.php") !== -1) {
+            return src + (src.indexOf("?") === -1 ? "?" : "&") + "autoplay=true";
+         }
+         return src;
+      }
+
+      function openVideo(src, kind, original) {
+         if (!src) return;
+         frame.innerHTML = "";
+         fallbackLink.href = original || src;
+         fallback.style.display = original ? "block" : "none";
+         if (kind === "video") {
+            const video = document.createElement("video");
+            video.src = src;
+            video.controls = true;
+            video.autoplay = true;
+            video.playsInline = true;
+            frame.appendChild(video);
+         } else {
+            const iframe = document.createElement("iframe");
+            iframe.src = autoplayUrl(src);
+            iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share";
+            iframe.allowFullscreen = true;
+            iframe.referrerPolicy = "strict-origin-when-cross-origin";
+            frame.appendChild(iframe);
+         }
+         modal.classList.add("is-open");
+         modal.setAttribute("aria-hidden", "false");
+         document.body.style.overflow = "hidden";
+      }
+
+      function closeVideo() {
+         modal.classList.remove("is-open");
+         modal.setAttribute("aria-hidden", "true");
+         frame.innerHTML = "";
+         fallbackLink.href = "#";
+         document.body.style.overflow = "";
+      }
+
+      if (openButton) {
+         openButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            openVideo(openButton.dataset.src, openButton.dataset.kind, openButton.dataset.original);
+         });
+      }
+
+      closeButton.addEventListener("click", closeVideo);
+      modal.addEventListener("click", function (event) {
+         if (event.target === modal) closeVideo();
+      });
+      document.addEventListener("keydown", function (event) {
+         if (event.key === "Escape" && modal.classList.contains("is-open")) closeVideo();
+      });
+   })();
+</script>
+{% endblock content %}

@@ -1,0 +1,230 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/jquery.dataTables.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/dataTables.bootstrap5.css' %}">
+<style>
+  .table-img { width: 96px; height: 42px; object-fit: cover; border-radius: 5px; }
+  .error-success-div {
+    max-height: 0;
+    opacity: 0;
+    padding: 10px 18px;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: max-height .3s ease, opacity .3s ease;
+  }
+  .error-success-div.show { max-height: 180px; opacity: 1; }
+  .success-message { background: #10cf1057; color: #096009; }
+  .error-message { background: #ff0d0d78; color: #890000; }
+  .action i { cursor: pointer; }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="container-fluid datatable-init">
+  <div class="card">
+    <div class="card-header pb-0 card-no-border">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1>Our Team Banner</h1>
+          <p class="text-muted mb-0">Controls the page header image and title on the Our Team page.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <button class="btn btn-pill btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addModal">
+            <i class="fa-solid fa-plus me-2"></i>Add Banner
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive custom-scrollbar">
+        <table class="display table-striped border" id="basic-1">
+          <thead>
+            <tr>
+              <th>S/L</th>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for banner in banners %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><img src="{{ banner.banner_image.url }}" class="table-img" alt="{{ banner.title }}"></td>
+              <td class="fw-bold">{{ banner.title }}</td>
+              <td>
+                {% if banner.is_active %}
+                <span class="badge rounded-pill badge-light-success">Active</span>
+                {% else %}
+                <span class="badge rounded-pill badge-light-danger">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <ul class="action">
+                  <li class="edit">
+                    <i class="fa-regular fa-pen-to-square edit-icon"
+                       data-bs-toggle="modal"
+                       data-bs-target="#editModal"
+                       data-id="{{ banner.id }}"
+                       data-title="{{ banner.title }}"
+                       data-active="{{ banner.is_active }}"></i>
+                  </li>
+                  <li class="delete">
+                    <i class="fa-solid fa-trash-can delete-icon" data-id="{{ banner.id }}" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal"></i>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 class="text-center">Add Our Team Banner</h1>
+        <form class="form theme-form dark-inputs" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add">
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Banner Title</label>
+              <input class="form-control" name="title" value="Our Team" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Banner Image</label>
+              <input class="form-control" name="banner_image" type="file" accept="image/*" required>
+              <small class="text-muted">Suggested size: 1907 x 323 pixels. Max size: 100KB.</small>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" name="is_active" checked>
+              <label class="form-check-label">Active</label>
+            </div>
+          </div>
+          <div class="px-4 mb-2"><div class="error-success-div"></div></div>
+          <div class="card-footer text-end">
+            <button class="btn btn-primary me-3" type="submit">Submit</button>
+            <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 class="text-center">Edit Our Team Banner</h1>
+        <form class="form theme-form dark-inputs" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="edit">
+          <input type="hidden" name="id" id="edit-id">
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Banner Title</label>
+              <input class="form-control" id="edit-title" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Change Banner Image</label>
+              <input class="form-control" name="banner_image" type="file" accept="image/*">
+              <small class="text-muted">Suggested size: 1907 x 323 pixels. Max size: 100KB. Leave empty to keep current.</small>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" name="is_active" id="edit-active">
+              <label class="form-check-label">Active</label>
+            </div>
+          </div>
+          <div class="px-4 mb-2"><div class="error-success-div"></div></div>
+          <div class="card-footer text-end">
+            <button class="btn btn-primary me-3" type="submit">Update</button>
+            <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <h4 class="mb-3">Are you sure?</h4>
+        <p class="mb-4">This action will permanently delete this banner.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button id="confirm-delete" class="btn btn-danger">Yes, Delete</button>
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/dataTables1.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom2.js' %}"></script>
+<script>
+  function showMessage(type, message, context) {
+    const div = $(context).find(".error-success-div");
+    div.removeClass("error-message success-message show").addClass(type + "-message").text(message);
+    requestAnimationFrame(() => div.addClass("show"));
+    if (type === "success") setTimeout(() => location.reload(), 1200);
+  }
+
+  $("#addModal form").on("submit", function (e) {
+    e.preventDefault();
+    fetch("{% url 'team_banner' %}", {
+      method: "POST",
+      body: new FormData(this),
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => showMessage(d.status, d.message, "#addModal"));
+  });
+
+  $(document).on("click", ".edit-icon", function () {
+    $("#edit-id").val(this.dataset.id);
+    $("#edit-title").val(this.dataset.title);
+    $("#edit-active").prop("checked", this.dataset.active === "True");
+  });
+
+  $("#editModal form").on("submit", function (e) {
+    e.preventDefault();
+    fetch("{% url 'team_banner' %}", {
+      method: "POST",
+      body: new FormData(this),
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => showMessage(d.status, d.message, "#editModal"));
+  });
+
+  let pendingDeleteId = null;
+  $(document).on("click", ".delete-icon", function () {
+    pendingDeleteId = this.dataset.id;
+  });
+
+  $("#confirm-delete").on("click", function () {
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("id", pendingDeleteId);
+    fetch("{% url 'team_banner' %}", {
+      method: "POST",
+      body: formData,
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    }).then(r => r.json()).then(d => {
+      if (d.status === "success") location.reload();
+      else alert(d.message);
+    });
+  });
+</script>
+{% endblock scriptcontent %}

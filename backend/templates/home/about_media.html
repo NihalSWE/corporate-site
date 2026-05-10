@@ -1,0 +1,57 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-xl-9">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h3>Home About Media</h3>
+          <p class="text-muted mb-0">Controls the two images and video link shown in the homepage About section.</p>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Big Image / Video Thumbnail</label>
+                <input class="form-control" type="file" name="big_image" accept="image/*" {% if not media %}required{% endif %}>
+                <small class="text-muted">Required size: 540 x 570 pixels. Max size: 50KB.</small>
+                {% if media and media.big_image %}
+                <div class="mt-2"><img src="{{ media.big_image.url }}" alt="" style="width:120px;height:126px;object-fit:cover;border-radius:6px;"></div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Small Image</label>
+                <input class="form-control" type="file" name="small_image" accept="image/*" {% if not media %}required{% endif %}>
+                <small class="text-muted">Required size: 300 x 200 pixels. Max size: 50KB.</small>
+                {% if media and media.small_image %}
+                <div class="mt-2"><img src="{{ media.small_image.url }}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:6px;"></div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Video URL</label>
+              <input class="form-control" type="url" name="video_url" value="{{ media.video_url|default:'' }}" placeholder="https://youtube.com/watch?v=..." required>
+              <small class="text-muted">Required. Supports YouTube, Facebook video/reel URLs, Vimeo, or direct video URLs.</small>
+            </div>
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_active" {% if media.is_active or not media %}checked{% endif %}>
+              <label class="form-check-label">Active</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save About Media</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

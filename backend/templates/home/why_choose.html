@@ -1,0 +1,116 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h3>Home Why Choose Us</h3>
+          <p class="text-muted mb-0">Controls the heading and four cards in the homepage Why Choose Us section.</p>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-5 mb-3">
+                <label class="form-label fw-bold">Small Title</label>
+                <input class="form-control" name="small_title" maxlength="80" value="{{ section.small_title|default:'CHOICES & OCCURS' }}">
+              </div>
+              <div class="col-md-7 mb-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Title</label>
+                  <small class="text-muted"><span data-count-for="title">0</span>/20</small>
+                </div>
+                <input class="form-control js-limited-field" name="title" maxlength="20" data-maxlength="20" value="{{ section.title|default:'Why People Choose us' }}" required>
+              </div>
+            </div>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between">
+                <label class="form-label fw-bold">Description</label>
+                <small class="text-muted"><span data-count-for="description">0</span>/120</small>
+              </div>
+              <textarea class="form-control js-limited-field" name="description" rows="3" maxlength="120" data-maxlength="120" required>{% if section %}{{ section.description }}{% else %}Explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system.{% endif %}</textarea>
+            </div>
+
+            {% for item in items %}
+            <div class="border rounded p-3 mb-3">
+              <input type="hidden" name="item_id_{{ forloop.counter }}" value="{% if item %}{{ item.id }}{% endif %}">
+              <h5 class="mb-3">Card {{ forloop.counter }}</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label fw-bold">Card Title</label>
+                    <small class="text-muted"><span data-count-for="item_title_{{ forloop.counter }}">0</span>/20</small>
+                  </div>
+                  <input class="form-control js-limited-field" name="item_title_{{ forloop.counter }}" maxlength="20" data-maxlength="20" value="{% if item %}{{ item.title }}{% endif %}">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <label class="form-label fw-bold mb-0">Icon Image</label>
+                    <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" rel="noopener" class="small">Choose icon</a>
+                  </div>
+                  <input class="form-control" type="file" name="item_icon_{{ forloop.counter }}" accept="image/*">
+                  {% if item and item.icon %}
+                  <div class="mt-2"><img src="{{ item.icon.url }}" alt="{{ item.title }}" style="width:64px;height:64px;object-fit:contain;"></div>
+                  {% endif %}
+                  <small class="text-muted">Download an icon from the link, then upload it here.</small>
+                </div>
+              </div>
+              <div>
+                <div class="d-flex justify-content-between">
+                  <label class="form-label fw-bold">Card Description</label>
+                  <small class="text-muted"><span data-count-for="item_description_{{ forloop.counter }}">0</span>/80</small>
+                </div>
+                <textarea class="form-control js-limited-field" name="item_description_{{ forloop.counter }}" rows="2" maxlength="80" data-maxlength="80">{% if item %}{{ item.description }}{% endif %}</textarea>
+              </div>
+            </div>
+            {% endfor %}
+
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_active" {% if section.is_active or not section %}checked{% endif %}>
+              <label class="form-check-label">Active</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save Why Choose Us</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script>
+  (function () {
+    document.querySelectorAll(".js-limited-field").forEach(function (field) {
+      var limit = parseInt(field.dataset.maxlength || field.getAttribute("maxlength"), 10);
+      var counter = document.querySelector('[data-count-for="' + field.name + '"]');
+
+      function syncCount() {
+        if (field.value.length > limit) {
+          field.value = field.value.slice(0, limit);
+        }
+        if (counter) {
+          counter.textContent = field.value.length;
+        }
+      }
+
+      field.addEventListener("input", syncCount);
+      field.addEventListener("paste", function () {
+        setTimeout(syncCount, 0);
+      });
+      syncCount();
+    });
+  })();
+</script>
+{% endblock scriptcontent %}

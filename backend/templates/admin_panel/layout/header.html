@@ -1,0 +1,38 @@
+<div class="page-header">
+  <div class="header-wrapper row m-0">
+    <div class="header-logo-wrapper col-auto p-0">
+      <a href="{% url 'dashboard_home' %}" class="logo-wrapper">Admin Panel</a>
+    </div>
+    <div class="left-header col horizontal-wrapper ps-0">
+      <h4 class="mb-0">{{ breadcrumb.title|default:"Dashboard" }}</h4>
+    </div>
+    <div class="nav-right col-8 pull-right right-header p-0">
+      <ul class="nav-menus">
+        <li class="profile-nav custom-user-menu">
+          <button class="custom-user-trigger" type="button">
+            <span class="header-user-avatar">
+              {% if request.user.profile.image %}
+                <img src="{{ request.user.profile.image.url }}" alt="{{ request.user.username }}">
+              {% else %}
+                <i data-feather="user"></i>
+              {% endif %}
+            </span>
+            <span>{{ request.user.username }}</span>
+          </button>
+          <div class="custom-user-dropdown">
+            <div class="custom-user-card">
+              <a class="custom-menu-link" href="{% url 'profile_home' %}">
+                <i data-feather="user"></i>
+                <span>Profile</span>
+              </a>
+              <a class="custom-logout-btn" href="{% url 'logout_home' %}">
+                <i data-feather="log-out"></i>
+                <span>Log out</span>
+              </a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

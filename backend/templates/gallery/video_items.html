@@ -1,0 +1,86 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  {% include "includes/alert.html" %}
+  <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <div>
+        <h4 class="mb-1">Video Gallery</h4>
+        <p class="text-muted mb-0">Add a YouTube, Vimeo, Facebook, or direct video link.</p>
+      </div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVideoModal"><i class="fa fa-plus"></i> Add Video</button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead><tr><th>Preview</th><th>Title</th><th>Order</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+          <tbody>
+            {% for video in videos %}
+            <tr>
+              <td>
+                {% if video.url %}
+                <a href="{{ video.url }}" target="_blank" rel="noopener">Video link</a>
+                {% else %}<span class="text-muted">No link</span>{% endif %}
+              </td>
+              <td>{{ video.title }}</td>
+              <td>{{ video.sort_order }}</td>
+              <td>{% if video.is_active %}<span class="badge badge-light-success">Active</span>{% else %}<span class="badge badge-light-danger">Hidden</span>{% endif %}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editVideoModal{{ video.id }}"><i class="fa fa-edit"></i> Edit</button>
+                <form method="POST" class="d-inline" onsubmit="return confirm('Delete this video?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="id" value="{{ video.id }}">
+                  <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+            <div class="modal fade" id="editVideoModal{{ video.id }}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header"><h5 class="modal-title">Edit Video</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="id" value="{{ video.id }}">
+                    <div class="modal-body">
+                      <div class="mb-3"><label class="form-label">Title</label><input name="title" class="form-control" value="{{ video.title }}" required></div>
+                      <div class="mb-3"><label class="form-label">Video Link</label><input name="url" type="url" class="form-control" value="{{ video.url|default:'' }}" placeholder="https://youtube.com/watch?v=..." required><small class="text-muted">Supports YouTube, Vimeo, Facebook, or direct video URLs.</small></div>
+                      <div class="mb-3"><label class="form-label">Order</label><input name="sort_order" type="number" class="form-control" value="{{ video.sort_order }}"></div>
+                      <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="videoActive{{ video.id }}" {% if video.is_active %}checked{% endif %}><label class="form-check-label" for="videoActive{{ video.id }}">Show on frontend</label></div>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No videos have been added yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addVideoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Add Video</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Title</label><input name="title" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Video Link</label><input name="url" type="url" class="form-control" placeholder="https://youtube.com/watch?v=..." required><small class="text-muted">Supports YouTube, Vimeo, Facebook, or direct video URLs.</small></div>
+          <div class="mb-3"><label class="form-label">Order</label><input name="sort_order" type="number" class="form-control" value="0"></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="addVideoActive" checked><label class="form-check-label" for="addVideoActive">Show on frontend</label></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Video</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

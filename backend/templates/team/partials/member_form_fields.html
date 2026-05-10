@@ -1,0 +1,43 @@
+<div class="card-body">
+  <div class="mb-3">
+    <label class="form-label">Name</label>
+    <input class="form-control" name="name" type="text" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Designation</label>
+    <input class="form-control" name="designation" type="text" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">{% if edit %}Change Image{% else %}Image{% endif %}</label>
+    <input class="form-control" name="image" type="file" accept="image/*" {% if not edit %}required{% endif %}>
+    <small class="text-muted">Required size: 354 x 373 pixels. Max size: 25KB.{% if edit %} Leave empty to keep current.{% endif %}</small>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Facebook URL</label>
+      <input class="form-control" name="facebook" type="url">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">LinkedIn URL</label>
+      <input class="form-control" name="linkedin" type="url">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Twitter URL</label>
+      <input class="form-control" name="twitter" type="url">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">YouTube URL</label>
+      <input class="form-control" name="youtube" type="url">
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Sort Order</label>
+    <input class="form-control" name="sort_order" type="number" min="0" value="0">
+  </div>
+  <div class="mb-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" name="is_active" checked>
+      <label class="form-check-label">Active</label>
+    </div>
+  </div>
+</div>

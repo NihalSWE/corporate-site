@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .contact-map-frame {
+      position: relative;
+      width: 100%;
+      min-height: 360px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #f4f5f7;
+   }
+   .contact-map-frame iframe {
+      display: block;
+      width: 100% !important;
+      min-height: 360px;
+      height: 450px !important;
+      border: 0;
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover">
+      <div class="simpleParallax">
+         {% if banner and banner.banner_image %}
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         {% else %}
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Contact" class="cover-parallax">
+         {% endif %}
+      </div>
+   </div>
+   <div class="page_header_content">
+      <div class="auto-container">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="banner_title_inner">
+                  <div class="title_page">{{ banner.title|default:"Contact" }}</div>
+               </div>
+            </div>
+            <div class="col-lg-12">
+               <div class="breadcrumbs creote">
+                  <ul class="breadcrumb m-auto">
+                     <li><a href="{% url 'home' %}">Home</a></li>
+                     <li class="active">{{ banner.title|default:"Contact" }}</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="contact-section">
+      <div class="pd_top_90"></div>
+      <div class="container">
+         {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+         {% endif %}
+
+         <div class="row align-items-center">
+            <div class="col-xl-6 col-lg-6 mb-5 mb-lg-5 mb-xl-0">
+               <div class="contact_form_box_all type_one">
+                  <div class="contact_form_box_inner">
+                     <div class="contact_form_shortcode">
+                        <form id="django-contact-form" method="post" action="{% url 'contact' %}" role="form">
+                           {% csrf_token %}
+                           <div class="messages"></div>
+                           <div class="controls">
+                              <div class="row">
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <label>Your Name<br></label>
+                                       <input type="text" name="name" value="{{ form.name.value|default:'' }}" placeholder="Your Name *" required>
+                                       {{ form.name.errors }}
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <label>Your Email<br></label>
+                                       <input type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="Email *" required>
+                                       {{ form.email.errors }}
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <label>Your Subject<br></label>
+                                       <input type="text" name="subject" value="{{ form.subject.value|default:'' }}" placeholder="Subject">
+                                       {{ form.subject.errors }}
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <label>Your Message<br></label>
+                                       <textarea name="message" placeholder="Additional Information..." rows="3" required>{{ form.message.value|default:'' }}</textarea>
+                                       {{ form.message.errors }}
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group mg_top apbtn">
+                                       <button class="theme_btn" type="submit">Send Message</button>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-xl-6 col-lg-6 pd_left_30">
+               <div class="title_all_box style_one dark_color">
+                  <div class="title_sections left">
+                     <div class="before_title">{{ section.small_title|default:"Contact Info to" }}</div>
+                     <h2>{{ section.title|default:"Reach Our Expert Team" }}</h2>
+                     <p>{{ section.description|default:"Send a message through given form. If your enquiry is time sensitive, please use the contact details below." }}</p>
+                  </div>
+               </div>
+
+               <div class="contact_box_content style_one">
+                  <div class="contact_box_inner icon_yes">
+                     <div class="icon_bx"><span class="icon-placeholder"></span></div>
+                     <div class="contnet">
+                        <h3>{{ info.address_title|default:"Post Address" }}</h3>
+                        <p>{{ info.address|default:"280 Granite Run Drive Suite #200 Lancaster, PA 1760" }}</p>
+                     </div>
+                  </div>
+               </div>
+               <div class="pd_bottom_15"></div>
+
+               <div class="contact_box_content style_one">
+                  <div class="contact_box_inner icon_yes">
+                     <div class="icon_bx"><span class="icon-phone-call"></span></div>
+                     <div class="contnet">
+                        <h3>{{ info.enquiry_title|default:"General Enquires" }}</h3>
+                        <p>Phone: {{ info.phone|default:"+98 060 712 34" }} &amp; Email: {{ info.email|default:"sendmail@qetus.com" }}</p>
+                     </div>
+                  </div>
+               </div>
+               <div class="pd_bottom_15"></div>
+
+               <div class="contact_box_content style_one">
+                  <div class="contact_box_inner icon_yes">
+                     <div class="icon_bx"><span class="fa fa-clock-o"></span></div>
+                     <div class="contnet">
+                        <h3>{{ info.hours_title|default:"Operation Hours" }}</h3>
+                        <p>{{ info.operation_hours|default:"Mon-Saturday: 09.00 to 07.00 (Sunday: Closed)" }}</p>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="pd_bottom_40"></div>
+               <div class="social_media_v_one style_two">
+                  <ul>
+                     {% if info.facebook %}<li><a href="{{ info.facebook }}"><span class="fa fa-facebook"></span><small>facebook</small></a></li>{% endif %}
+                     {% if info.youtube %}<li><a href="{{ info.youtube }}"><span class="fa fa-youtube-play"></span><small>youtube</small></a></li>{% endif %}
+                     {% if whatsapp_link %}<li><a href="{{ whatsapp_link }}" target="_blank" rel="noopener"><span class="fa fa-whatsapp"></span><small>whatsapp</small></a></li>{% endif %}
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="pd_top_70"></div>
+   </section>
+
+   {% if map_data and map_embed_html %}
+   <section class="contact-map-section">
+      <div class="container">
+         <div class="row">
+            <div class="col-lg-12">
+               <section class="map-section">
+                  <div class="title_all_box style_six text-center">
+                     <div class="title_sections">
+                        <div class="title">{{ map_data.map_title|default:"Our Location" }}</div>
+                     </div>
+                     <div class="pd_bottom_20"></div>
+                  </div>
+                  <div class="map-outer">
+                     <div class="contact-map-frame">
+                        {{ map_embed_html|safe }}
+                     </div>
+                  </div>
+               </section>
+            </div>
+         </div>
+      </div>
+      <div class="pd_top_90"></div>
+   </section>
+   {% endif %}
+</div>
+{% endblock content %}

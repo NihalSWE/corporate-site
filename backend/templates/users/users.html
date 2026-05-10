@@ -1,0 +1,241 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block custom_css %}
+<style>
+  .users-page-wrap {
+    padding: 28px 16px 60px;
+  }
+
+  .users-panel {
+    background: #fff;
+    border: 1px solid #edf0f7;
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+  }
+
+  .users-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 26px;
+    background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 70%);
+    border-bottom: 1px solid #edf0f7;
+  }
+
+  .users-panel-header h4 {
+    margin: 0 0 5px;
+    color: #1f2937;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .users-panel-header p {
+    margin: 0;
+    color: #667085;
+  }
+
+  .users-count {
+    border-radius: 999px;
+    background: #eef4ff;
+    color: var(--theme-default);
+    font-weight: 800;
+    padding: 8px 14px;
+    white-space: nowrap;
+  }
+
+  .users-table-wrap {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    margin: 0;
+    min-width: 860px;
+  }
+
+  .users-table thead th {
+    color: #667085;
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    background: #fbfcff;
+    border-bottom: 1px solid #edf0f7;
+    padding: 14px 18px;
+  }
+
+  .users-table tbody td {
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f2f7;
+    padding: 16px 18px;
+  }
+
+  .users-table tbody tr.current-user-row td {
+    background: #fbfaff;
+  }
+
+  .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--theme-default);
+    color: #fff;
+    font-weight: 800;
+    overflow: hidden;
+    text-transform: uppercase;
+  }
+
+  .user-avatar.default-avatar {
+    background: #eef4ff;
+    color: var(--theme-default);
+  }
+
+  .user-avatar.default-avatar svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .user-main {
+    color: #1f2937;
+    font-weight: 800;
+  }
+
+  .user-sub {
+    color: #667085;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .role-badge {
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .role-super {
+    background: #ecfdf3;
+    color: #027a48;
+  }
+
+  .role-staff {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  .role-user {
+    background: #eef4ff;
+    color: var(--theme-default);
+  }
+
+  .current-login-badge {
+    border-radius: 999px;
+    background: var(--theme-default);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 767px) {
+    .users-panel-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 22px;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="users-page-wrap">
+    <div class="users-panel">
+      <div class="users-panel-header">
+        <div>
+          <h4>Users</h4>
+          <p>All registered superusers, staff users, and normal users.</p>
+        </div>
+        <div class="users-count">{{ users|length }} Total</div>
+      </div>
+
+      <div class="users-table-wrap">
+        <table class="table users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Phone Number</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user_item in users %}
+              <tr class="{% if user_item.id == request.user.id %}current-user-row{% endif %}">
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar {% if not user_item.profile.image %}default-avatar{% endif %}">
+                      {% if user_item.profile.image %}
+                        <img src="{{ user_item.profile.image.url }}" alt="{{ user_item.username }}">
+                      {% else %}
+                        <i data-feather="user"></i>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <div class="user-main">{{ user_item.get_full_name|default:user_item.username }}</div>
+                      <div class="user-sub">@{{ user_item.username }}</div>
+                      {% if user_item.id == request.user.id %}
+                        <span class="current-login-badge">Current Login</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>{{ user_item.email|default:"-" }}</td>
+                <td>{{ user_item.profile.phone_number|default:"-" }}</td>
+                <td>
+                  {% if user_item.is_superuser %}
+                    <span class="role-badge role-super">Superuser</span>
+                  {% elif user_item.is_staff %}
+                    <span class="role-badge role-staff">Staff</span>
+                  {% else %}
+                    <span class="role-badge role-user">User</span>
+                  {% endif %}
+                </td>
+                <td>{% if user_item.is_active %}Active{% else %}Inactive{% endif %}</td>
+                <td>{{ user_item.date_joined|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td class="text-center text-muted" colspan="6">No users found.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

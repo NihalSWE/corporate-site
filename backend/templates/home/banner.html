@@ -1,0 +1,206 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xl-5">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h3>Home Banner</h3>
+          <p class="text-muted mb-0">Image can be up to 1920 x 850 pixels and max 200KB.</p>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="banner-id">
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <label class="form-label fw-bold">Subtitle</label>
+                <small class="text-muted"><span id="banner-subtitle-count">0</span>/15</small>
+              </div>
+              <input class="form-control" name="subtitle" id="banner-subtitle" maxlength="15" required>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <label class="form-label fw-bold">Title</label>
+                <small class="text-muted"><span id="banner-title-count">0</span>/25</small>
+              </div>
+              <input class="form-control" name="title" id="banner-title" maxlength="25" required>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <label class="form-label fw-bold">Short Line Description</label>
+                <small class="text-muted"><span id="banner-description-count">0</span>/100</small>
+              </div>
+              <textarea class="form-control" name="description" id="banner-description" rows="3" maxlength="100" required></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Subtitle Color</label>
+                <input class="form-control form-control-color w-100" type="color" id="banner-subtitle-color-picker" value="#ffffff">
+                <input type="hidden" name="subtitle_color" id="banner-subtitle-color">
+                <small class="text-muted">Leave default for theme color.</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Title Color</label>
+                <input class="form-control form-control-color w-100" type="color" id="banner-title-color-picker" value="#ffffff">
+                <input type="hidden" name="title_color" id="banner-title-color">
+                <small class="text-muted">Leave default for theme color.</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Description Color</label>
+                <input class="form-control form-control-color w-100" type="color" id="banner-description-color-picker" value="#ffffff">
+                <input type="hidden" name="description_color" id="banner-description-color">
+                <small class="text-muted">Leave default for theme color.</small>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary mb-3" type="button" id="banner-clear-colors">Use Theme Colors</button>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Image</label>
+              <input class="form-control" type="file" name="image" accept="image/*">
+              <small class="text-muted">Maximum size: 1920 x 850 pixels. Max file size: 200KB.</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Sort Order</label>
+              <input class="form-control" type="number" name="sort_order" id="banner-sort" value="0" min="0">
+            </div>
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_active" id="banner-active" checked>
+              <label class="form-check-label">Active</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save Banner</button>
+            <button class="btn btn-light" type="button" id="banner-reset">Reset</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-7">
+      <div class="card">
+        <div class="card-header pb-0"><h3>Saved Banners</h3></div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr><th>Image</th><th>Title</th><th>Subtitle</th><th>Active</th><th>Action</th></tr></thead>
+              <tbody>
+                {% for banner in banners %}
+                <tr>
+                  <td>{% if banner.image %}<img src="{{ banner.image.url }}" alt="" style="width:120px;height:48px;object-fit:cover;border-radius:6px;">{% endif %}</td>
+                  <td>{{ banner.title }}</td>
+                  <td>{{ banner.subtitle }}</td>
+                  <td>{% if banner.is_active %}Yes{% else %}No{% endif %}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary js-edit-banner" type="button"
+                      data-id="{{ banner.id }}"
+                      data-title="{{ banner.title|escape }}"
+                      data-subtitle="{{ banner.subtitle|escape }}"
+                      data-description="{{ banner.description|escape }}"
+                      data-title-color="{{ banner.title_color }}"
+                      data-subtitle-color="{{ banner.subtitle_color }}"
+                      data-description-color="{{ banner.description_color }}"
+                      data-sort="{{ banner.sort_order }}"
+                      data-active="{% if banner.is_active %}1{% else %}0{% endif %}">Edit</button>
+                    <form method="post" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete">
+                      <input type="hidden" name="id" value="{{ banner.id }}">
+                      <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">No banners saved yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scriptcontent %}
+<script>
+  (function () {
+    const id = document.getElementById("banner-id");
+    const subtitle = document.getElementById("banner-subtitle");
+    const title = document.getElementById("banner-title");
+    const description = document.getElementById("banner-description");
+    const subtitleCount = document.getElementById("banner-subtitle-count");
+    const titleCount = document.getElementById("banner-title-count");
+    const descriptionCount = document.getElementById("banner-description-count");
+    const titleColor = document.getElementById("banner-title-color");
+    const subtitleColor = document.getElementById("banner-subtitle-color");
+    const descriptionColor = document.getElementById("banner-description-color");
+    const titleColorPicker = document.getElementById("banner-title-color-picker");
+    const subtitleColorPicker = document.getElementById("banner-subtitle-color-picker");
+    const descriptionColorPicker = document.getElementById("banner-description-color-picker");
+    const sort = document.getElementById("banner-sort");
+    const active = document.getElementById("banner-active");
+
+    function setColor(hidden, picker, value) {
+      hidden.value = value || "";
+      picker.value = value || "#ffffff";
+    }
+
+    function updateCounts() {
+      subtitleCount.textContent = subtitle.value.length;
+      titleCount.textContent = title.value.length;
+      descriptionCount.textContent = description.value.length;
+    }
+
+    [subtitle, title, description].forEach(function (field) {
+      field.addEventListener("input", updateCounts);
+    });
+
+    [[titleColor, titleColorPicker], [subtitleColor, subtitleColorPicker], [descriptionColor, descriptionColorPicker]].forEach(function (pair) {
+      pair[1].addEventListener("input", function () {
+        pair[0].value = pair[1].value;
+      });
+    });
+
+    document.querySelectorAll(".js-edit-banner").forEach(function (button) {
+      button.addEventListener("click", function () {
+        id.value = button.dataset.id;
+        title.value = button.dataset.title;
+        subtitle.value = button.dataset.subtitle;
+        description.value = button.dataset.description;
+        setColor(titleColor, titleColorPicker, button.dataset.titleColor);
+        setColor(subtitleColor, subtitleColorPicker, button.dataset.subtitleColor);
+        setColor(descriptionColor, descriptionColorPicker, button.dataset.descriptionColor);
+        sort.value = button.dataset.sort;
+        active.checked = button.dataset.active === "1";
+        updateCounts();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+    document.getElementById("banner-reset").addEventListener("click", function () {
+      id.value = "";
+      title.value = "";
+      subtitle.value = "";
+      description.value = "";
+      setColor(titleColor, titleColorPicker, "");
+      setColor(subtitleColor, subtitleColorPicker, "");
+      setColor(descriptionColor, descriptionColorPicker, "");
+      sort.value = "0";
+      active.checked = true;
+      updateCounts();
+    });
+    document.getElementById("banner-clear-colors").addEventListener("click", function () {
+      setColor(titleColor, titleColorPicker, "");
+      setColor(subtitleColor, subtitleColorPicker, "");
+      setColor(descriptionColor, descriptionColorPicker, "");
+    });
+    updateCounts();
+  })();
+</script>
+{% endblock scriptcontent %}
