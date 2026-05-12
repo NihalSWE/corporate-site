@@ -89,10 +89,12 @@
             </div>
           </div>
 
+          {% for address in address_fields %}
           <div class="mb-3">
-            <label class="form-label">Address</label>
-            <textarea class="form-control" name="address" rows="3" required>{{ info.address }}</textarea>
+            <label class="form-label">Post Address {{ forloop.counter }}</label>
+            <textarea class="form-control" name="address_{{ forloop.counter }}" rows="3" {% if forloop.first %}required{% endif %}>{{ address }}</textarea>
           </div>
+          {% endfor %}
 
           <div class="row">
             <div class="col-md-6 mb-3">

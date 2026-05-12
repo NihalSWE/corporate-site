@@ -12,6 +12,7 @@ from backend.models import (
     SisterConcern,
     WebsiteFavicon,
 )
+from backend.content_helpers import attach_sister_concern_asset_urls, split_contact_addresses
 
 
 def sister_concerns(request):
@@ -28,9 +29,17 @@ def sister_concerns(request):
             if whatsapp_number:
                 site_whatsapp_url = f"https://wa.me/{whatsapp_number}"
 
+    site_contact_addresses = split_contact_addresses(site_contact.address if site_contact else "")
+
+    nav_sister_concerns = list(SisterConcern.objects.filter(is_active=True).order_by("sort_order", "title"))
+    for concern in nav_sister_concerns:
+        attach_sister_concern_asset_urls(concern)
+
     return {
-        "nav_sister_concerns": SisterConcern.objects.filter(is_active=True).order_by("sort_order", "title"),
+        "nav_sister_concerns": nav_sister_concerns,
         "site_contact": site_contact,
+        "site_contact_address": site_contact_addresses[0] if site_contact_addresses else "",
+        "site_contact_addresses": site_contact_addresses,
         "site_whatsapp_url": site_whatsapp_url,
         "site_logo": Logo.objects.filter(is_active=True).first(),
         "site_favicon": WebsiteFavicon.objects.filter(is_active=True).first(),

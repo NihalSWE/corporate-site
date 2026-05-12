@@ -508,10 +508,10 @@
                       {% for concern in home_sister_concerns %}
                       <div class="service_box  type_one clearfix">
                          <div class="image_box">
-                            {% if concern.display_image %}
-                            <img src="{{ concern.display_image.url }}" class="img-fluid home-service-logo" alt="{{ concern.title }}" />
-                            {% elif concern.logo %}
-                            <img src="{{ concern.logo.url }}" class="img-fluid home-service-logo is-logo" alt="{{ concern.title }}" />
+                            {% if concern.display_image_existing_url %}
+                            <img src="{{ concern.display_image_existing_url }}" class="img-fluid home-service-logo" alt="{{ concern.title }}" />
+                            {% elif concern.logo_existing_url %}
+                            <img src="{{ concern.logo_existing_url }}" class="img-fluid home-service-logo is-logo" alt="{{ concern.title }}" />
                             {% else %}
                             <img src="{% static 'assets/images/service/service-image-6.jpg' %}" class="img-fluid home-service-logo" alt="{{ concern.title }}" />
                             {% endif %}

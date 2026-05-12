@@ -90,14 +90,19 @@
               <input class="form-control" type="file" name="badge_image" accept="image/*">
               <small class="text-muted">Required size: 52 x 52 pixels. Max size: 5KB. Leave empty to keep current.</small>
               {% if section and section.badge_image %}
-                <div class="mt-2"><img src="{{ section.badge_image.url }}" alt="" style="width: 52px; height: 52px; object-fit: contain; border-radius: 50%;"></div>
+                <div class="mt-2 d-flex align-items-center gap-3">
+                  <img src="{{ section.badge_image.url }}" alt="" style="width: 52px; height: 52px; object-fit: contain; border-radius: 50%;">
+                  <label class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" name="remove_badge_image">
+                    <span class="form-check-label">Remove existing image</span>
+                  </label>
+                </div>
               {% endif %}
             </div>
 
             <div class="mb-3">
               <div class="d-flex justify-content-between">
                 <label class="form-label fw-bold">Description</label>
-                <small class="text-muted"><span id="description-count">0</span>/3000</small>
               </div>
               <div class="about-editor-shell">
                 <div id="description-editor">{{ section.description|safe }}</div>
@@ -108,26 +113,38 @@
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Main Image</label>
-                <input class="form-control" type="file" name="main_image" accept="image/*" {% if not section %}required{% endif %}>
-                <small class="text-muted">Required size: 273 x 372 pixels. Max size: 25KB.</small>
+                <input class="form-control" type="file" name="main_image" accept="image/*">
+                <small class="text-muted">Optional. Required size when uploaded: 273 x 372 pixels. Max size: 25KB.</small>
                 {% if section and section.main_image %}
-                  <div class="mt-2"><img src="{{ section.main_image.url }}" alt="" style="width: 90px; height: 124px; object-fit: cover; border-radius: 6px;"></div>
+                  <div class="mt-2 d-flex align-items-center gap-3">
+                    <img src="{{ section.main_image.url }}" alt="" style="width: 90px; height: 124px; object-fit: cover; border-radius: 6px;">
+                    <label class="form-check mb-0">
+                      <input class="form-check-input" type="checkbox" name="remove_main_image">
+                      <span class="form-check-label">Remove existing image</span>
+                    </label>
+                  </div>
                 {% endif %}
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Video Thumbnail</label>
-                <input class="form-control" type="file" name="video_thumbnail" accept="image/*" {% if not section %}required{% endif %}>
-                <small class="text-muted">Required size: 273 x 372 pixels. Max size: 25KB.</small>
+                <input class="form-control" type="file" name="video_thumbnail" accept="image/*">
+                <small class="text-muted">Optional. Required size when uploaded: 273 x 372 pixels. Max size: 25KB.</small>
                 {% if section and section.video_thumbnail %}
-                  <div class="mt-2"><img src="{{ section.video_thumbnail.url }}" alt="" style="width: 90px; height: 124px; object-fit: cover; border-radius: 6px;"></div>
+                  <div class="mt-2 d-flex align-items-center gap-3">
+                    <img src="{{ section.video_thumbnail.url }}" alt="" style="width: 90px; height: 124px; object-fit: cover; border-radius: 6px;">
+                    <label class="form-check mb-0">
+                      <input class="form-check-input" type="checkbox" name="remove_video_thumbnail">
+                      <span class="form-check-label">Remove existing image</span>
+                    </label>
+                  </div>
                 {% endif %}
               </div>
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Video URL</label>
-              <input class="form-control" type="url" name="video_url" value="{{ section.video_url|default:'' }}" placeholder="https://youtube.com/watch?v=..." required>
-              <small class="text-muted">Required. Supports YouTube, Facebook video/reel URLs, Vimeo, or direct video URLs.</small>
+              <input class="form-control" type="url" name="video_url" value="{{ section.video_url|default:'' }}" placeholder="https://youtube.com/watch?v=...">
+              <small class="text-muted">Optional. Supports YouTube, Facebook video/reel URLs, Vimeo, or direct video URLs.</small>
             </div>
 
             <div class="form-check form-switch mb-4">
@@ -148,7 +165,6 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <script>
   (function () {
-    const count = document.getElementById("description-count");
     const hiddenDescription = document.getElementById("description");
     const form = hiddenDescription.closest("form");
 
@@ -170,42 +186,9 @@
       placeholder: "Write the full About Us description here..."
     });
 
-    function getEditorText(editor) {
-      return editor.getText().replace(/\n$/, "");
-    }
-
-    function getEditorLength(editor) {
-      return getEditorText(editor).length;
-    }
-
-    function enforceEditorLimit(editor, maxLength, counter) {
-      const length = getEditorLength(editor);
-      if (length > maxLength) {
-        const selection = editor.getSelection();
-        editor.deleteText(maxLength, length - maxLength, "silent");
-        if (selection) {
-          editor.setSelection(Math.min(selection.index, maxLength), 0, "silent");
-        }
-      }
-      counter.textContent = Math.min(getEditorLength(editor), maxLength);
-    }
-
-    function updateLongCount() {
-      enforceEditorLimit(quill, 3000, count);
-    }
-
-    quill.on("text-change", updateLongCount);
     form.addEventListener("submit", function (event) {
-      const longLength = getEditorLength(quill);
-      if (longLength > 3000) {
-        event.preventDefault();
-        alert("Description must be 3000 characters or fewer.");
-        return;
-      }
       hiddenDescription.value = quill.root.innerHTML;
     });
-
-    updateLongCount();
   })();
 </script>
 {% endblock scriptcontent %}

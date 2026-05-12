@@ -18,6 +18,32 @@
       height: 450px !important;
       border: 0;
    }
+   .contact-address-slider {
+      position: relative;
+   }
+   .contact-address-slide {
+      display: none;
+   }
+   .contact-address-slide.is-active {
+      display: block;
+   }
+   .contact-address-controls {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+   }
+   .contact-address-dot {
+      width: 9px;
+      height: 9px;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: #c8d3d7;
+      cursor: pointer;
+   }
+   .contact-address-dot.is-active {
+      background: #078586;
+   }
 </style>
 {% endblock custom_css %}
 
@@ -128,7 +154,20 @@
                      <div class="icon_bx"><span class="icon-placeholder"></span></div>
                      <div class="contnet">
                         <h3>{{ info.address_title|default:"Post Address" }}</h3>
-                        <p>{{ info.address|default:"280 Granite Run Drive Suite #200 Lancaster, PA 1760" }}</p>
+                        <div class="contact-address-slider" data-contact-address-slider>
+                           {% for address in contact_addresses %}
+                           <p class="contact-address-slide {% if forloop.first %}is-active{% endif %}">{{ address|linebreaksbr }}</p>
+                           {% empty %}
+                           <p class="contact-address-slide is-active">280 Granite Run Drive Suite #200 Lancaster, PA 1760</p>
+                           {% endfor %}
+                           {% if contact_addresses|length > 1 %}
+                           <div class="contact-address-controls" aria-label="Office address selector">
+                              {% for address in contact_addresses %}
+                              <button class="contact-address-dot {% if forloop.first %}is-active{% endif %}" type="button" data-address-index="{{ forloop.counter0 }}" aria-label="Show address {{ forloop.counter }}"></button>
+                              {% endfor %}
+                           </div>
+                           {% endif %}
+                        </div>
                      </div>
                   </div>
                </div>
@@ -194,4 +233,34 @@
    </section>
    {% endif %}
 </div>
+<script>
+   (function () {
+      const slider = document.querySelector("[data-contact-address-slider]");
+      if (!slider) return;
+      const slides = Array.from(slider.querySelectorAll(".contact-address-slide"));
+      const dots = Array.from(slider.querySelectorAll(".contact-address-dot"));
+      if (slides.length <= 1) return;
+      let activeIndex = 0;
+      let timer = null;
+
+      function showSlide(index) {
+         activeIndex = (index + slides.length) % slides.length;
+         slides.forEach((slide, slideIndex) => slide.classList.toggle("is-active", slideIndex === activeIndex));
+         dots.forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === activeIndex));
+      }
+
+      function startAutoSlide() {
+         clearInterval(timer);
+         timer = setInterval(() => showSlide(activeIndex + 1), 4200);
+      }
+
+      dots.forEach((dot) => {
+         dot.addEventListener("click", function () {
+            showSlide(Number(this.dataset.addressIndex || 0));
+            startAutoSlide();
+         });
+      });
+      startAutoSlide();
+   })();
+</script>
 {% endblock content %}

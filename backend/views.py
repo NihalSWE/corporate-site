@@ -9,10 +9,27 @@ from django.utils.html import strip_tags
 from django.utils.text import slugify
 import re
 
+from .content_helpers import (
+    delete_team_profile_description,
+    get_contact_address_fields,
+    attach_sister_concern_asset_urls,
+    existing_file_url,
+    load_team_profile_descriptions,
+    pack_contact_addresses,
+    SISTER_CONCERN_GALLERY_LIMIT,
+    set_team_profile_description,
+)
 from .models import *
 from .models import UserProfile
 
 MAX_PROFILE_IMAGE_SIZE = 50 * 1024
+
+
+def remove_uploaded_file(instance, field_name):
+    file_field = getattr(instance, field_name, None)
+    if file_field:
+        file_field.delete(save=False)
+        setattr(instance, field_name, "")
 
 
 def clean_icon_class(value):
@@ -588,7 +605,11 @@ def contact_info_admin(request):
         elif form_type == "info":
             info = info or ContactInfo()
             info.address_title = request.POST.get("address_title", "").strip() or "Post Address"
-            info.address = request.POST.get("address", "").strip()
+            info.address = pack_contact_addresses([
+                request.POST.get("address_1", "").strip(),
+                request.POST.get("address_2", "").strip(),
+                request.POST.get("address_3", "").strip(),
+            ])
             info.enquiry_title = request.POST.get("enquiry_title", "").strip() or "General Enquires"
             info.phone = request.POST.get("phone", "").strip()
             info.email = request.POST.get("email", "").strip()
@@ -615,6 +636,7 @@ def contact_info_admin(request):
             "layout": "light",
             "section": section,
             "info": info,
+            "address_fields": get_contact_address_fields(info.address if info else ""),
         },
     )
 
@@ -687,7 +709,7 @@ def team_members_admin(request):
                 if not image:
                     return admin_json("error", "Please upload a team member image.")
 
-                TeamMember.objects.create(
+                member = TeamMember.objects.create(
                     name=request.POST.get("name", "").strip(),
                     designation=request.POST.get("designation", "").strip(),
                     image=image,
@@ -698,6 +720,7 @@ def team_members_admin(request):
                     sort_order=request.POST.get("sort_order") or 0,
                     is_active=bool(request.POST.get("is_active")),
                 )
+                set_team_profile_description(member.id, request.POST.get("description", ""))
                 return admin_json("success", "Team member saved successfully.")
 
             if action == "edit":
@@ -713,15 +736,23 @@ def team_members_admin(request):
                 if request.FILES.get("image"):
                     member.image = request.FILES["image"]
                 member.save()
+                set_team_profile_description(member.id, request.POST.get("description", ""))
                 return admin_json("success", "Team member updated successfully.")
 
             if action == "delete":
-                get_object_or_404(TeamMember, id=request.POST.get("id")).delete()
+                member_id = request.POST.get("id")
+                get_object_or_404(TeamMember, id=member_id).delete()
+                delete_team_profile_description(member_id)
                 return admin_json("success", "Team member deleted successfully.")
         except Exception as exc:
             return admin_json("error", str(exc))
 
         return admin_json("error", "Invalid action.")
+
+    members = list(TeamMember.objects.all())
+    profile_descriptions = load_team_profile_descriptions()
+    for member in members:
+        member.profile_description = profile_descriptions.get(str(member.id), "")
 
     return render(
         request,
@@ -729,7 +760,7 @@ def team_members_admin(request):
         {
             "breadcrumb": {"title": "Our Team"},
             "layout": "light",
-            "members": TeamMember.objects.all(),
+            "members": members,
         },
     )
 
@@ -1046,6 +1077,13 @@ def about_hero_admin(request):
         section.video_url = request.POST.get("video_url", "").strip() or None
         section.is_active = bool(request.POST.get("is_active"))
 
+        if request.POST.get("remove_badge_image") and not request.FILES.get("badge_image"):
+            remove_uploaded_file(section, "badge_image")
+        if request.POST.get("remove_main_image") and not request.FILES.get("main_image"):
+            remove_uploaded_file(section, "main_image")
+        if request.POST.get("remove_video_thumbnail") and not request.FILES.get("video_thumbnail"):
+            remove_uploaded_file(section, "video_thumbnail")
+
         if request.FILES.get("badge_image"):
             section.badge_image = request.FILES["badge_image"]
         if request.FILES.get("main_image"):
@@ -1057,15 +1095,15 @@ def about_hero_admin(request):
 
         if not description_text:
             messages.error(request, "Description is required.")
-        elif len(description_text) > 3000:
-            messages.error(request, "Description must be 3000 characters or fewer.")
-        elif not section.main_image or not section.video_thumbnail:
-            messages.error(request, "Both images are required.")
-        elif not section.video_url:
-            messages.error(request, "Please enter a video URL.")
         else:
             try:
-                section.full_clean()
+                section.full_clean(exclude=["badge_image", "main_image", "video_thumbnail"])
+                if request.FILES.get("badge_image"):
+                    validate_about_badge_image(section.badge_image)
+                if request.FILES.get("main_image"):
+                    validate_about_hero_image(section.main_image)
+                if request.FILES.get("video_thumbnail"):
+                    validate_about_hero_image(section.video_thumbnail)
                 section.save()
                 messages.success(request, "About leaders section saved successfully.")
             except Exception as exc:
@@ -1172,6 +1210,13 @@ def sister_concern_admin(request):
             if action == "add":
                 logo = request.FILES.get("logo")
                 display_image = request.FILES.get("display_image")
+                gallery_images = request.FILES.getlist("gallery_images")
+                if len(gallery_images) > SISTER_CONCERN_GALLERY_LIMIT:
+                    messages.error(request, "You can upload at most 10 gallery images.")
+                    return redirect("sister_concern_items")
+                for gallery_image in gallery_images:
+                    validate_sister_concern_display_image(gallery_image)
+                    gallery_image.seek(0)
 
                 concern = SisterConcern(
                     title=request.POST.get("title", "").strip(),
@@ -1184,25 +1229,67 @@ def sister_concern_admin(request):
                 )
                 concern.full_clean()
                 concern.save()
+                for index, gallery_image in enumerate(gallery_images, start=1):
+                    SisterConcernGalleryImage.objects.create(
+                        sister_concern=concern,
+                        image=gallery_image,
+                        sort_order=index,
+                    )
                 messages.success(request, "Sister concern saved successfully.")
 
             elif action == "edit":
                 concern = get_object_or_404(SisterConcern, id=request.POST.get("id"))
+                SisterConcernGalleryImage.objects.filter(
+                    sister_concern=concern,
+                    id__in=request.POST.getlist("remove_gallery_images"),
+                ).delete()
+                existing_gallery_count = concern.gallery_images.count()
+                gallery_images = request.FILES.getlist("gallery_images")
+                if existing_gallery_count + len(gallery_images) > SISTER_CONCERN_GALLERY_LIMIT:
+                    messages.error(request, "Sister concern gallery can have at most 10 images.")
+                    return redirect("sister_concern_items")
+                for gallery_image in gallery_images:
+                    validate_sister_concern_display_image(gallery_image)
+                    gallery_image.seek(0)
+
                 concern.title = request.POST.get("title", "").strip()
                 concern.description = request.POST.get("description", "").strip()
                 concern.link = request.POST.get("link", "").strip() or None
                 concern.sort_order = request.POST.get("sort_order") or 0
                 concern.is_active = bool(request.POST.get("is_active"))
+                remove_logo = bool(request.POST.get("remove_logo")) and not request.FILES.get("logo")
+                remove_display_image = bool(request.POST.get("remove_display_image")) and not request.FILES.get("display_image")
+                if remove_logo and concern.logo:
+                    concern.logo.delete(save=False)
+                    concern.logo = None
+                if remove_display_image and concern.display_image:
+                    concern.display_image.delete(save=False)
+                    concern.display_image = None
                 if request.FILES.get("logo"):
                     concern.logo = request.FILES["logo"]
                 if request.FILES.get("display_image"):
                     concern.display_image = request.FILES["display_image"]
                 concern.full_clean()
                 concern.save()
+                update_fields = {}
+                if remove_logo:
+                    update_fields["logo"] = None
+                if remove_display_image:
+                    update_fields["display_image"] = None
+                if update_fields:
+                    SisterConcern.objects.filter(pk=concern.pk).update(**update_fields)
+                next_order = existing_gallery_count + 1
+                for offset, gallery_image in enumerate(gallery_images):
+                    SisterConcernGalleryImage.objects.create(
+                        sister_concern=concern,
+                        image=gallery_image,
+                        sort_order=next_order + offset,
+                    )
                 messages.success(request, "Sister concern updated successfully.")
 
             elif action == "delete":
-                get_object_or_404(SisterConcern, id=request.POST.get("id")).delete()
+                concern_id = request.POST.get("id")
+                get_object_or_404(SisterConcern, id=concern_id).delete()
                 messages.success(request, "Sister concern deleted successfully.")
 
             else:
@@ -1212,7 +1299,16 @@ def sister_concern_admin(request):
 
         return redirect("sister_concern_items")
 
-    sister_concerns = SisterConcern.objects.all().order_by("sort_order", "title")
+    sister_concerns = list(SisterConcern.objects.all().order_by("sort_order", "title"))
+    for concern in sister_concerns:
+        attach_sister_concern_asset_urls(concern)
+        concern.gallery_items = []
+        for gallery_image in concern.gallery_images.all():
+            gallery_image.existing_url = existing_file_url(gallery_image.image)
+            if gallery_image.existing_url:
+                concern.gallery_items.append(gallery_image)
+        concern.gallery_slots_remaining = SISTER_CONCERN_GALLERY_LIMIT - len(concern.gallery_items)
+
     return render(
         request,
         "sister_concern/list.html",

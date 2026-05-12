@@ -4,6 +4,7 @@
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/jquery.dataTables.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/dataTables.bootstrap5.css' %}">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
   .team-thumb { width: 58px; height: 62px; object-fit: cover; border-radius: 6px; }
   .error-success-div {
@@ -18,6 +19,38 @@
   .success-message { background: #10cf1057; color: #096009; }
   .error-message { background: #ff0d0d78; color: #890000; }
   .action i { cursor: pointer; }
+  .modal-dialog {
+    max-width: 760px;
+  }
+  .team-editor-shell {
+    border: 1px solid #e3e8ef;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  }
+  .team-editor-shell .ql-toolbar.ql-snow {
+    border: 0;
+    border-bottom: 1px solid #e3e8ef;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef6f6 100%);
+    padding: 10px 12px;
+  }
+  .team-editor-shell .ql-container.ql-snow {
+    border: 0;
+  }
+  .team-editor-shell .ql-editor {
+    min-height: 180px;
+    font-size: 1rem;
+  }
+  .team-editor-shell .ql-active .ql-stroke,
+  .team-editor-shell button:hover .ql-stroke,
+  .team-editor-shell .ql-picker-label:hover .ql-stroke {
+    stroke: #008b8b;
+  }
+  .team-editor-shell .ql-active .ql-fill,
+  .team-editor-shell button:hover .ql-fill {
+    fill: #008b8b;
+  }
 </style>
 {% endblock css %}
 
@@ -75,6 +108,7 @@
                        data-id="{{ member.id }}"
                        data-name="{{ member.name }}"
                        data-designation="{{ member.designation }}"
+                       data-description="{{ member.profile_description|default:''|escape }}"
                        data-facebook="{{ member.facebook|default:'' }}"
                        data-linkedin="{{ member.linkedin|default:'' }}"
                        data-twitter="{{ member.twitter|default:'' }}"
@@ -158,8 +192,46 @@
 <script src="{% static 'assets/js/datatable/datatables/dataTables1.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/dataTables.bootstrap5.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom2.js' %}"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
+  const teamEditors = {};
+  const teamToolbarOptions = [
+    [{ "header": [2, 3, 4, false] }],
+    ["bold", "italic", "underline"],
+    [{ "color": [] }, { "background": [] }],
+    [{ "list": "ordered" }, { "list": "bullet" }],
+    [{ "align": [] }],
+    ["link"],
+    ["clean"]
+  ];
+
+  function initializeTeamEditor(modalSelector) {
+    const editorElement = document.querySelector(modalSelector + " .team-description-editor");
+    if (!editorElement || teamEditors[modalSelector]) return teamEditors[modalSelector];
+    teamEditors[modalSelector] = new Quill(editorElement, {
+      theme: "snow",
+      modules: { toolbar: teamToolbarOptions },
+      placeholder: "Write the profile description..."
+    });
+    return teamEditors[modalSelector];
+  }
+
+  function setTeamDescription(modalSelector, html) {
+    const editor = initializeTeamEditor(modalSelector);
+    if (editor) editor.root.innerHTML = html || "";
+    $(modalSelector + " [name='description']").val(html || "");
+  }
+
+  function syncTeamDescription(modalSelector) {
+    const editor = initializeTeamEditor(modalSelector);
+    if (!editor) return;
+    $(modalSelector + " [name='description']").val(editor.root.innerHTML);
+  }
+
+  initializeTeamEditor("#addModal");
+  initializeTeamEditor("#editModal");
+
   function showMessage(type, message, context) {
     const div = $(context).find(".error-success-div");
     div.removeClass("error-message success-message show").addClass(type + "-message").text(message);
@@ -169,6 +241,7 @@
 
   $("#addModal form").on("submit", function (e) {
     e.preventDefault();
+    syncTeamDescription("#addModal");
     fetch("{% url 'team_members' %}", {
       method: "POST",
       body: new FormData(this),
@@ -181,6 +254,7 @@
     $("#edit-id").val(ds.id);
     $("#editModal [name='name']").val(ds.name);
     $("#editModal [name='designation']").val(ds.designation);
+    setTeamDescription("#editModal", ds.description);
     $("#editModal [name='facebook']").val(ds.facebook);
     $("#editModal [name='linkedin']").val(ds.linkedin);
     $("#editModal [name='twitter']").val(ds.twitter);
@@ -191,6 +265,7 @@
 
   $("#editModal form").on("submit", function (e) {
     e.preventDefault();
+    syncTeamDescription("#editModal");
     fetch("{% url 'team_members' %}", {
       method: "POST",
       body: new FormData(this),

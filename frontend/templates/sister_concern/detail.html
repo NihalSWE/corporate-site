@@ -94,6 +94,115 @@
       transform: translateY(-1px);
    }
 
+   .sister-gallery-section {
+      margin-top: 42px;
+      padding-top: 34px;
+      border-top: 1px solid #e7ebf0;
+   }
+
+   .sister-gallery-title {
+      color: #202a44;
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0 0 22px;
+   }
+
+   .sister-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+   }
+
+   .sister-gallery-item {
+      display: block;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f2f4f7;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.11);
+   }
+
+   .sister-gallery-item img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 360 / 350;
+      object-fit: cover;
+      transition: transform .2s ease;
+   }
+
+   .sister-gallery-item:hover img { transform: scale(1.04); }
+   .sister-gallery-item.is-hidden {
+      display: none;
+   }
+
+   .sister-gallery-actions {
+      margin-top: 22px;
+      text-align: center;
+   }
+
+   .sister-gallery-view-all {
+      min-height: 48px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 24px;
+      background: #078586;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(7, 133, 134, 0.22);
+   }
+
+   .sister-gallery-view-all:hover {
+      background: #066f70;
+   }
+
+   .custom-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 18, 22, 0.88);
+      padding: 58px 76px;
+   }
+   .custom-lightbox.is-open { display: flex; }
+   .custom-lightbox-image {
+      max-width: calc(100vw - 180px);
+      max-height: calc(100vh - 130px);
+      object-fit: contain;
+      display: block;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+   }
+   .custom-lightbox-btn {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.42);
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+   }
+   .custom-lightbox-btn:hover { background: rgba(0, 0, 0, 0.68); color: #fff; }
+   .custom-lightbox-close { top: 18px; right: 22px; }
+   .custom-lightbox-prev { left: 22px; top: 50%; transform: translateY(-50%); }
+   .custom-lightbox-next { right: 22px; top: 50%; transform: translateY(-50%); }
+   .custom-lightbox-count {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+   }
+
    @media (max-width: 767px) {
       .sister-concern-page {
          padding: 30px 0 56px;
@@ -117,6 +226,10 @@
          float: none;
          margin: 0 0 24px;
       }
+      .custom-lightbox { padding: 56px 18px; }
+      .custom-lightbox-image { max-width: calc(100vw - 36px); max-height: calc(100vh - 128px); }
+      .custom-lightbox-prev { left: 8px; }
+      .custom-lightbox-next { right: 8px; }
    }
 </style>
 {% endblock custom_css %}
@@ -158,17 +271,17 @@
       <div class="sister-concern-card">
          <h1 class="sister-concern-title">{{ concern.title }}</h1>
          <div class="sister-concern-flow">
-            {% if concern.display_image %}
+            {% if concern.display_image_existing_url %}
             <div class="sister-concern-image">
-               <img src="{{ concern.display_image.url }}" alt="{{ concern.title }}">
+               <img src="{{ concern.display_image_existing_url }}" alt="{{ concern.title }}">
             </div>
             {% endif %}
-            <div class="sister-concern-description">{{ concern.description|linebreaksbr }}</div>
+            <div class="sister-concern-description">{{ concern.description|safe }}</div>
          </div>
 
-         {% if concern.logo %}
+         {% if concern.logo_existing_url %}
          <div class="sister-logo-box">
-            <img src="{{ concern.logo.url }}" alt="{{ concern.title }}">
+            <img src="{{ concern.logo_existing_url }}" alt="{{ concern.title }}">
          </div>
          {% endif %}
 
@@ -177,7 +290,101 @@
             Visit Site For More Info <i class="icon-right-arrow"></i>
          </a>
          {% endif %}
+
+         {% if gallery_images %}
+         <div class="sister-gallery-section">
+            <h2 class="sister-gallery-title">Gallery</h2>
+            <div class="sister-gallery-grid">
+               {% for image_url in gallery_images %}
+               <a class="sister-gallery-item js-sister-gallery-image {% if forloop.counter > 4 %}is-hidden{% endif %}" href="{{ image_url }}" data-index="{{ forloop.counter0 }}">
+                  <img src="{{ image_url }}" alt="{{ concern.title }} gallery image {{ forloop.counter }}">
+               </a>
+               {% endfor %}
+            </div>
+            {% if gallery_images|length > 4 %}
+            <div class="sister-gallery-actions">
+               <button class="sister-gallery-view-all" type="button" id="sisterGalleryViewAll">View All</button>
+            </div>
+            {% endif %}
+         </div>
+         {% endif %}
       </div>
    </section>
 </div>
+
+{% if gallery_images %}
+<div class="custom-lightbox" id="customSisterGalleryLightbox" aria-hidden="true">
+   <div class="custom-lightbox-count" id="customSisterGalleryCount"></div>
+   <button class="custom-lightbox-btn custom-lightbox-close" type="button" id="customSisterGalleryClose" aria-label="Close">&times;</button>
+   <button class="custom-lightbox-btn custom-lightbox-prev" type="button" id="customSisterGalleryPrev" aria-label="Previous">&#8249;</button>
+   <img class="custom-lightbox-image" id="customSisterGalleryImage" src="" alt="{{ concern.title }}">
+   <button class="custom-lightbox-btn custom-lightbox-next" type="button" id="customSisterGalleryNext" aria-label="Next">&#8250;</button>
+</div>
+
+<script>
+   (function () {
+      const links = Array.from(document.querySelectorAll(".js-sister-gallery-image"));
+      const modal = document.getElementById("customSisterGalleryLightbox");
+      const image = document.getElementById("customSisterGalleryImage");
+      const count = document.getElementById("customSisterGalleryCount");
+      const closeBtn = document.getElementById("customSisterGalleryClose");
+      const prevBtn = document.getElementById("customSisterGalleryPrev");
+      const nextBtn = document.getElementById("customSisterGalleryNext");
+      const viewAllBtn = document.getElementById("sisterGalleryViewAll");
+      let currentIndex = 0;
+
+      function showImage(index) {
+         if (!links.length) return;
+         currentIndex = (index + links.length) % links.length;
+         image.src = links[currentIndex].href;
+         count.textContent = (currentIndex + 1) + " / " + links.length;
+      }
+
+      function openLightbox(index) {
+         showImage(index);
+         modal.classList.add("is-open");
+         modal.setAttribute("aria-hidden", "false");
+         document.body.style.overflow = "hidden";
+      }
+
+      function closeLightbox() {
+         modal.classList.remove("is-open");
+         modal.setAttribute("aria-hidden", "true");
+         image.src = "";
+         document.body.style.overflow = "";
+      }
+
+      links.forEach(function (link, index) {
+         link.addEventListener("click", function (event) {
+            event.preventDefault();
+            openLightbox(index);
+         });
+      });
+
+      if (viewAllBtn) {
+         viewAllBtn.addEventListener("click", function () {
+            links.forEach(function (link) {
+               link.classList.remove("is-hidden");
+            });
+            viewAllBtn.parentElement.style.display = "none";
+         });
+      }
+
+      closeBtn.addEventListener("click", closeLightbox);
+      prevBtn.addEventListener("click", function () { showImage(currentIndex - 1); });
+      nextBtn.addEventListener("click", function () { showImage(currentIndex + 1); });
+
+      modal.addEventListener("click", function (event) {
+         if (event.target === modal) closeLightbox();
+      });
+
+      document.addEventListener("keydown", function (event) {
+         if (!modal.classList.contains("is-open")) return;
+         if (event.key === "Escape") closeLightbox();
+         if (event.key === "ArrowLeft") showImage(currentIndex - 1);
+         if (event.key === "ArrowRight") showImage(currentIndex + 1);
+      });
+   })();
+</script>
+{% endif %}
 {% endblock content %}

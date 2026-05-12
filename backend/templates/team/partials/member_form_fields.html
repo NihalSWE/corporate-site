@@ -8,6 +8,13 @@
     <input class="form-control" name="designation" type="text" required>
   </div>
   <div class="mb-3">
+    <label class="form-label">Description</label>
+    <input type="hidden" name="description">
+    <div class="team-editor-shell">
+      <div class="team-description-editor"></div>
+    </div>
+  </div>
+  <div class="mb-3">
     <label class="form-label">{% if edit %}Change Image{% else %}Image{% endif %}</label>
     <input class="form-control" name="image" type="file" accept="image/*" {% if not edit %}required{% endif %}>
     <small class="text-muted">Required size: 354 x 373 pixels. Max size: 25KB.{% if edit %} Leave empty to keep current.{% endif %}</small>

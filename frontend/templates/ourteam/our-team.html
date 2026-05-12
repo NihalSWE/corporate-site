@@ -9,7 +9,30 @@
       object-fit: cover;
    }
    .team_box.style_one .button_view {
-      display: none !important;
+      left: 25px;
+      right: auto;
+      bottom: 24px;
+      z-index: 30;
+   }
+   .team_box.style_one .button_view a {
+      min-width: 160px;
+      min-height: 58px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: #078586;
+      color: #fff;
+      font-weight: 700;
+   }
+   .team_box.style_one .button_view a:hover {
+      color: #fff;
+      background: #066f70;
+   }
+   .team_box.style_one .team_box_outer:hover .button_view,
+   .team_box.style_one .team_box_outer:focus-within .button_view {
+      opacity: 1;
+      transform: translateX(0);
    }
 </style>
 {% endblock custom_css %}
@@ -87,6 +110,9 @@
                         <div class="authour_details">
                            <span>{{ member.designation }}</span>
                            <h6>{{ member.name }}</h6>
+                           <div class="button_view">
+                              <a href="{% url 'team_member_detail' member.name|slugify %}">View Profile</a>
+                           </div>
                         </div>
                      </div>
                   </div>

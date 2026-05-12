@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+   .team-profile-section {
+      background: #fff;
+   }
+   .team-profile-layout:after {
+      content: "";
+      display: table;
+      clear: both;
+   }
+   .team-profile-image {
+      float: left;
+      width: min(400px, 38%);
+      margin: 0 20px 18px 0;
+      border-radius: 7px;
+      overflow: hidden;
+      background: #f2f4f7;
+   }
+   .team-profile-image img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+   }
+   .team-profile-heading h1 {
+      margin: 0 0 18px;
+      color: #6e737d;
+      font-size: 42px;
+      line-height: 1.15;
+      font-weight: 800;
+   }
+   .team-profile-heading .designation {
+      color: #006cff;
+      font-size: 21px;
+      line-height: 1.35;
+      margin-bottom: 22px;
+   }
+   .team-profile-description {
+      color: #4f4f4f;
+      font-size: 21px;
+      line-height: 1.45;
+      text-align: justify;
+   }
+   .team-profile-description p {
+      margin-bottom: 22px;
+   }
+   .team-profile-empty {
+      color: #666;
+      font-size: 18px;
+   }
+   @media (max-width: 991px) {
+      .team-profile-image {
+         float: none;
+         width: 100%;
+         max-width: 420px;
+         margin: 0 0 24px;
+      }
+      .team-profile-heading h1 {
+         font-size: 34px;
+      }
+      .team-profile-description {
+         font-size: 18px;
+      }
+   }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page_header_default style_one">
+   <div class="parallax_cover">
+      <div class="simpleParallax">
+         {% if banner and banner.banner_image %}
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         {% else %}
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Our Team" class="cover-parallax">
+         {% endif %}
+      </div>
+   </div>
+   <div class="page_header_content">
+      <div class="auto-container">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="banner_title_inner">
+                  <div class="title_page">{{ member.name }}</div>
+               </div>
+            </div>
+            <div class="col-lg-12">
+               <div class="breadcrumbs creote">
+                  <ul class="breadcrumb m-auto">
+                     <li><a href="{% url 'home' %}">Home</a></li>
+                     <li><a href="{% url 'ourteam' %}">{{ banner.title|default:"Our Team" }}</a></li>
+                     <li class="active">{{ member.name }}</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="content" class="site-content">
+   <section class="team-profile-section">
+      <div class="pd_top_90"></div>
+      <div class="container">
+         <div class="team-profile-layout">
+            <div class="team-profile-image">
+               <img src="{{ member.image.url }}" alt="{{ member.name }}">
+            </div>
+            <div class="team-profile-heading">
+               <h1>{{ member.name }}</h1>
+               <div class="designation">{{ member.designation }}</div>
+            </div>
+            {% if profile_description %}
+            <div class="team-profile-description">
+               {{ profile_description|safe }}
+            </div>
+            {% else %}
+            <p class="team-profile-empty">Profile details will be added soon.</p>
+            {% endif %}
+         </div>
+      </div>
+      <div class="pd_bottom_90"></div>
+   </section>
+</div>
+{% endblock content %}

@@ -1,5 +1,59 @@
 {% extends 'admin_panel/base.html' %}
 
+{% block css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .sister-editor-shell {
+        border: 1px solid #e3e8ef;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+    .sister-editor-shell .ql-toolbar.ql-snow {
+        border: 0;
+        border-bottom: 1px solid #e3e8ef;
+        background: linear-gradient(180deg, #f8fafc 0%, #eef6f6 100%);
+        padding: 10px 12px;
+    }
+    .sister-editor-shell .ql-container.ql-snow { border: 0; }
+    .sister-editor-shell .ql-editor {
+        min-height: 190px;
+        font-size: 1rem;
+    }
+    .sister-gallery-admin {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .sister-gallery-admin-item {
+        border: 1px solid #e3e8ef;
+        border-radius: 8px;
+        padding: 8px;
+        background: #fff;
+    }
+    .sister-gallery-admin-item img {
+        width: 100%;
+        aspect-ratio: 360 / 350;
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .sister-gallery-error {
+        display: none;
+        border: 1px solid rgba(220, 53, 69, 0.25);
+        border-radius: 7px;
+        background: #f8d7da;
+        color: #842029;
+        padding: 10px 12px;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+</style>
+{% endblock css %}
+
 {% block content %}
 <div class="container-fluid">
     {% include "includes/alert.html" %}
@@ -33,17 +87,17 @@
                         {% for concern in sister_concerns %}
                         <tr>
                             <td>
-                                {% if concern.display_image %}
-                                <img src="{{ concern.display_image.url }}" width="90" height="88" class="rounded border bg-white p-1" style="object-fit:cover;" alt="{{ concern.title }}">
+                                {% if concern.display_image_existing_url %}
+                                <img src="{{ concern.display_image_existing_url }}" width="90" height="88" class="rounded border bg-white p-1" style="object-fit:cover;" alt="{{ concern.title }}">
                                 {% endif %}
                             </td>
                             <td>
-                                {% if concern.logo %}
-                                <img src="{{ concern.logo.url }}" width="120" class="rounded border bg-white p-1" alt="{{ concern.title }}">
+                                {% if concern.logo_existing_url %}
+                                <img src="{{ concern.logo_existing_url }}" width="120" class="rounded border bg-white p-1" alt="{{ concern.title }}">
                                 {% endif %}
                             </td>
                             <td>{{ concern.title }}</td>
-                            <td style="max-width: 360px;">{{ concern.description|truncatechars:120 }}</td>
+                            <td style="max-width: 360px;">{{ concern.description|striptags|truncatechars:120 }}</td>
                             <td>
                                 {% if concern.link %}
                                 <a href="{{ concern.link }}" target="_blank" rel="noopener">{{ concern.link|truncatechars:36 }}</a>
@@ -79,7 +133,7 @@
                                         <h5 class="modal-title">Edit Sister Concern</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <form method="POST" enctype="multipart/form-data">
+                                    <form method="POST" enctype="multipart/form-data" class="sister-concern-form">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="edit">
                                         <input type="hidden" name="id" value="{{ concern.id }}">
@@ -96,7 +150,10 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Description</label>
-                                                <textarea name="description" class="form-control" rows="5" required>{{ concern.description }}</textarea>
+                                                <input type="hidden" name="description" value="{{ concern.description|escape }}">
+                                                <div class="sister-editor-shell">
+                                                    <div class="sister-description-editor">{{ concern.description|safe }}</div>
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Link</label>
@@ -104,19 +161,50 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Logo Image</label><br>
-                                                {% if concern.logo %}
-                                                <img src="{{ concern.logo.url }}" width="160" class="rounded border bg-white p-2 mb-2" alt="{{ concern.title }}">
+                                                {% if concern.logo_existing_url %}
+                                                <div class="mb-2 d-flex align-items-center gap-3">
+                                                    <img src="{{ concern.logo_existing_url }}" width="160" class="rounded border bg-white p-2" alt="{{ concern.title }}">
+                                                    <label class="form-check mb-0">
+                                                        <input class="form-check-input" type="checkbox" name="remove_logo" value="1">
+                                                        <span class="form-check-label">Remove existing logo</span>
+                                                    </label>
+                                                </div>
                                                 {% endif %}
                                                 <input type="file" name="logo" class="form-control" accept="image/*">
                                                 <small class="text-muted">Optional. Leave empty to keep the current logo.</small>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Display Image</label><br>
-                                                {% if concern.display_image %}
-                                                <img src="{{ concern.display_image.url }}" width="160" height="156" class="rounded border bg-white p-2 mb-2" style="object-fit:cover;" alt="{{ concern.title }}">
+                                                {% if concern.display_image_existing_url %}
+                                                <div class="mb-2 d-flex align-items-center gap-3">
+                                                    <img src="{{ concern.display_image_existing_url }}" width="160" height="156" class="rounded border bg-white p-2" style="object-fit:cover;" alt="{{ concern.title }}">
+                                                    <label class="form-check mb-0">
+                                                        <input class="form-check-input" type="checkbox" name="remove_display_image" value="1">
+                                                        <span class="form-check-label">Remove existing display image</span>
+                                                    </label>
+                                                </div>
                                                 {% endif %}
                                                 <input type="file" name="display_image" class="form-control" accept="image/*">
                                                 <small class="text-muted">Optional. If uploaded, required size: 360 x 350 pixels. Max size: 50KB. Leave empty to keep current image.</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Gallery Images</label>
+                                                {% if concern.gallery_items %}
+                                                <div class="sister-gallery-admin">
+                                                    {% for image in concern.gallery_items %}
+                                                    <div class="sister-gallery-admin-item">
+                                                        <img src="{{ image.existing_url }}" alt="{{ concern.title }}">
+                                                        <label class="form-check mb-0">
+                                                            <input class="form-check-input" type="checkbox" name="remove_gallery_images" value="{{ image.id }}">
+                                                            <span class="form-check-label">Remove</span>
+                                                        </label>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <input type="file" name="gallery_images" class="form-control sister-gallery-input" accept="image/*" multiple data-gallery-current="{{ concern.gallery_items|length }}" data-gallery-max="10" {% if concern.gallery_slots_remaining <= 0 %}disabled{% endif %}>
+                                                <div class="sister-gallery-error" role="alert"></div>
+                                                <small class="text-muted">Optional. Upload up to {{ concern.gallery_slots_remaining }} more image(s). Total limit: 10. Required size: 360 x 350 pixels. Max size: 50KB each.</small>
                                             </div>
                                             <div class="form-check">
                                                 <input type="checkbox" name="is_active" class="form-check-input" id="isActive{{ concern.id }}" {% if concern.is_active %}checked{% endif %}>
@@ -149,7 +237,7 @@
                 <h5 class="modal-title">Add Sister Concern</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" class="sister-concern-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="add">
                 <div class="modal-body">
@@ -165,7 +253,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="5" required></textarea>
+                        <input type="hidden" name="description">
+                        <div class="sister-editor-shell">
+                            <div class="sister-description-editor"></div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Logo Image</label>
@@ -176,6 +267,12 @@
                         <label class="form-label">Display Image</label>
                         <input type="file" name="display_image" class="form-control" accept="image/*">
                         <small class="text-muted">Optional. If uploaded, required size: 360 x 350 pixels. Max size: 50KB.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gallery Images</label>
+                        <input type="file" name="gallery_images" class="form-control sister-gallery-input" accept="image/*" multiple data-gallery-current="0" data-gallery-max="10">
+                        <div class="sister-gallery-error" role="alert"></div>
+                        <small class="text-muted">Optional. Upload up to 10 images. Required size: 360 x 350 pixels. Max size: 50KB each.</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Link</label>
@@ -194,3 +291,88 @@
     </div>
 </div>
 {% endblock %}
+
+{% block scriptcontent %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    (function () {
+        const toolbarOptions = [
+            [{ "header": [2, 3, 4, false] }],
+            ["bold", "italic", "underline"],
+            [{ "color": [] }, { "background": [] }],
+            [{ "list": "ordered" }, { "list": "bullet" }],
+            [{ "align": [] }],
+            ["link"],
+            ["clean"]
+        ];
+
+        document.querySelectorAll(".sister-description-editor").forEach(function (editorElement) {
+            const quill = new Quill(editorElement, {
+                theme: "snow",
+                modules: { toolbar: toolbarOptions },
+                placeholder: "Write the sister concern description..."
+            });
+            const form = editorElement.closest("form");
+            const hiddenInput = form ? form.querySelector("[name='description']") : null;
+            if (!form || !hiddenInput) return;
+            form.addEventListener("submit", function () {
+                hiddenInput.value = quill.root.innerHTML;
+            });
+        });
+
+        function selectedRemovalCount(form) {
+            return form.querySelectorAll("[name='remove_gallery_images']:checked").length;
+        }
+
+        function showGalleryError(errorBox, message) {
+            if (!errorBox) return;
+            errorBox.textContent = message;
+            errorBox.style.display = "block";
+            errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        function clearGalleryError(errorBox) {
+            if (!errorBox) return;
+            errorBox.textContent = "";
+            errorBox.style.display = "none";
+        }
+
+        function validateGalleryLimit(input, clearInvalidSelection) {
+            const form = input.closest("form");
+            const errorBox = form ? form.querySelector(".sister-gallery-error") : null;
+            const currentCount = Number(input.dataset.galleryCurrent || 0);
+            const maxCount = Number(input.dataset.galleryMax || 10);
+            const selectedCount = input.files ? input.files.length : 0;
+            const nextCount = currentCount - selectedRemovalCount(form) + selectedCount;
+
+            if (nextCount > maxCount) {
+                const allowed = Math.max(maxCount - currentCount + selectedRemovalCount(form), 0);
+                const message = "Gallery limit crossed. You can upload only " + allowed + " more image(s). Total limit is " + maxCount + ".";
+                showGalleryError(errorBox, message);
+                if (clearInvalidSelection) input.value = "";
+                return false;
+            }
+
+            clearGalleryError(errorBox);
+            return true;
+        }
+
+        document.querySelectorAll(".sister-gallery-input").forEach(function (input) {
+            input.addEventListener("change", function () {
+                validateGalleryLimit(input, true);
+            });
+        });
+
+        document.querySelectorAll(".sister-concern-form").forEach(function (form) {
+            form.addEventListener("submit", function (event) {
+                const galleryInput = form.querySelector(".sister-gallery-input");
+                if (galleryInput && !validateGalleryLimit(galleryInput, false)) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return false;
+                }
+            }, true);
+        });
+    })();
+</script>
+{% endblock scriptcontent %}

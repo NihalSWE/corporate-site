@@ -2,8 +2,16 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.html import escape, strip_tags
 from django.utils.safestring import mark_safe
+from django.utils.text import slugify
 from backend.models import *
 from backend.forms import ContactMessageForm
+from backend.content_helpers import (
+    attach_sister_concern_asset_urls,
+    get_team_profile_description,
+    existing_file_url,
+    split_contact_addresses,
+)
+from django.http import Http404
 from urllib.parse import parse_qs, quote, urlparse
 import re
 # Create your views here.
@@ -88,6 +96,10 @@ def home(request):
         about_video_original_url = about_media.video_url or ""
         about_video_url, about_video_is_direct = normalize_video_url(about_media.video_url)
 
+    home_sister_concerns = list(SisterConcern.objects.filter(is_active=True))
+    for concern in home_sister_concerns:
+        attach_sister_concern_asset_urls(concern)
+
     return render(
         request,
         "index.html",
@@ -103,7 +115,7 @@ def home(request):
             "home_business_section": HomeBusinessSection.objects.filter(is_active=True).first(),
             "home_business_items": HomeBusinessItem.objects.filter(is_active=True).order_by("sort_order", "id")[:3],
             "home_services_section": HomeServiceSection.objects.filter(is_active=True).first(),
-            "home_sister_concerns": SisterConcern.objects.filter(is_active=True),
+            "home_sister_concerns": home_sister_concerns,
             "home_why_choose_section": HomeWhyChooseSection.objects.filter(is_active=True).first(),
             "home_why_choose_items": HomeWhyChooseItem.objects.filter(is_active=True).order_by("sort_order", "id")[:4],
             "home_faq_section": HomeFAQSection.objects.filter(is_active=True).first(),
@@ -121,6 +133,10 @@ def aboutUs(request):
         origin = f"{request.scheme}://{request.get_host()}"
         video_original_url = hero_section.video_url or ""
         video_url, video_is_direct = normalize_video_url(hero_section.video_url, origin)
+    has_about_media = bool(
+        hero_section
+        and (hero_section.main_image or hero_section.video_thumbnail)
+    )
 
     return render(
         request,
@@ -131,6 +147,7 @@ def aboutUs(request):
             "video_url": video_url,
             "video_is_direct": video_is_direct,
             "video_original_url": video_original_url,
+            "has_about_media": has_about_media,
         },
     )
 
@@ -182,6 +199,7 @@ def contact (request):
         "banner": banner,
         "section": section,
         "info": info,
+        "contact_addresses": split_contact_addresses(info.address if info else ""),
         "map_data": map_data,
         "map_embed_html": map_embed_html,
         "form": form,
@@ -200,14 +218,49 @@ def ourteam(request):
     )
 
 
+def team_member_slug(member):
+    return slugify(member.name) or f"team-member-{member.id}"
+
+
+def team_member_detail_by_id(request, member_id):
+    member = get_object_or_404(TeamMember, id=member_id, is_active=True)
+    return redirect("team_member_detail", member_slug=team_member_slug(member), permanent=True)
+
+
+def team_member_detail(request, member_slug):
+    member = None
+    for team_member in TeamMember.objects.filter(is_active=True):
+        if team_member_slug(team_member) == member_slug:
+            member = team_member
+            break
+    if member is None:
+        raise Http404("Team member not found")
+
+    return render(
+        request,
+        "ourteam/team-detail.html",
+        {
+            "banner": TeamBanner.objects.filter(is_active=True).first(),
+            "member": member,
+            "profile_description": get_team_profile_description(member.id),
+        },
+    )
+
+
 def sister_concern_detail(request, slug):
     concern = get_object_or_404(SisterConcern, slug=slug, is_active=True)
+    attach_sister_concern_asset_urls(concern)
     return render(
         request,
         "sister_concern/detail.html",
         {
             "banner": SisterConcernBanner.objects.filter(is_active=True).first(),
             "concern": concern,
+            "gallery_images": [
+                existing_file_url(gallery_image.image)
+                for gallery_image in concern.gallery_images.all()
+                if existing_file_url(gallery_image.image)
+            ],
         },
     )
 

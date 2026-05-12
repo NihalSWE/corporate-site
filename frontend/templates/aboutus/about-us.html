@@ -169,30 +169,28 @@
       <div class="pd_top_90"></div>
       <div class="container">
          <div class="row about-flow-row">
+            {% if has_about_media %}
             <div class="col-xl-6 col-lg-12 about-media-float">
                <div class="image_boxes style_two">
                   <img src="{% static 'assets/images/shape-1.png' %}" class="background_image" alt="shape">
+                  {% if hero_section.main_image %}
                   <div class="image one">
-                     {% if hero_section and hero_section.main_image %}
                      <img src="{{ hero_section.main_image.url }}" class="img-fluid" alt="{{ hero_section.title }}">
-                     {% else %}
-                     <img src="{% static 'assets/images/about/about-6.png' %}" class="img-fluid" alt="about">
-                     {% endif %}
                   </div>
+                  {% endif %}
+                  {% if hero_section.video_thumbnail %}
                   <div class="image two">
-                     {% if hero_section and hero_section.video_thumbnail %}
                      <img src="{{ hero_section.video_thumbnail.url }}" class="img-fluid" alt="{{ hero_section.title }}">
-                     {% else %}
-                     <img src="{% static 'assets/images/about/about-7.png' %}" class="img-fluid" alt="video">
-                     {% endif %}
+                     {% if video_url %}
                      <div class="video_box">
-                        {% if video_url %}
                         <a href="{{ video_url }}" class="js-about-video-open" data-src="{{ video_url }}" data-original="{{ video_original_url }}" data-kind="{% if video_is_direct %}video{% else %}iframe{% endif %}"><i class="icon-play"></i></a>
-                        {% endif %}
                      </div>
+                     {% endif %}
                   </div>
+                  {% endif %}
                </div>
             </div>
+            {% endif %}
 
             <div class="col-xl-6 col-lg-12 about-content-flow">
                <div class="about_content position-relative z_99">
