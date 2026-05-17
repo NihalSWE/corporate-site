@@ -15,6 +15,8 @@
    {% else %}
    <link rel="icon" href="{% static 'assets/images/favicon.ico' %}" type="image/x-icon">
    {% endif %}
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Spartan%3A400%2C500%2C600%2C700%2C800%2C900%7CInter%3A300%2C400%2C500%2C600%2C700%2C800%2C900&amp;subset=latin%2Clatin-ext" type="text/css" media="all" />
    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" type="text/css" media="all" />
    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" type="text/css" media="all" />
@@ -117,6 +119,16 @@
          background: var(--primary-color-one, #078586);
          transform: scale(1.12);
       }
+
+      .page_header_default .parallax_cover,
+      .page_header_default .simpleParallax {
+         contain: layout paint;
+      }
+
+      .page_header_default .cover-parallax {
+         display: block;
+         aspect-ratio: 1907 / 323;
+      }
    </style>
    {% block custom_css %}
   
@@ -127,13 +139,6 @@
    <div id="page" class="page_wapper hfeed site">
       <div id="wrapper_full" class="content_all_warpper">
          <!---page-header---->
-         <!---preloader-->
-         <div class="preloader-wrap">
-            <div class="preloader" style="background-image:url({% static 'assets/images/preloader.gif' %})">
-            </div>
-            <div class="overlay"></div>
-         </div>
-         <!--preloader end-->
           <!-- header area start -->
     {% include "partial/header.html" %}
     <!-- header area end -->
@@ -226,9 +231,9 @@
                      <div class="abt_content">
                         <div class="logo">
                            {% if site_logo and site_logo.image %}
-                           <img src="{{ site_logo.image.url }}" alt="img" class="company_logo_modal">
+                           <img src="{{ site_logo.image.url }}" alt="img" class="company_logo_modal" loading="lazy" decoding="async">
                            {% else %}
-                           <img src="{% static 'assets/images/logo-default.png' %}" alt="img" class="company_logo_modal">
+                           <img src="{% static 'assets/images/logo-default.png' %}" alt="img" class="company_logo_modal" loading="lazy" decoding="async">
                            {% endif %}
                         </div>
                         <div class="text">
@@ -246,7 +251,7 @@
                               {% for gallery_image in modal_gallery_images %}
                               <div class="modal_post_grid">
                                  <a href="{% url 'photo_gallery_detail' gallery_image.album.slug %}">
-                                    <img width="852" height="812" src="{{ gallery_image.image.url }}"
+                                    <img width="852" height="812" src="{{ gallery_image.image.url }}" loading="lazy" decoding="async"
                                        class="main_img wp-post-image" alt="{{ gallery_image.album.title|default:'Photo gallery' }}" />
                                  </a>
                               </div>
@@ -287,10 +292,6 @@
       <script type="text/javascript" src="{% static 'assets/js/jquery.countTo.js' %}"></script>
       <script type="text/javascript" src="{% static 'assets/js/sharer.js' %}"></script>
       <script type="text/javascript" src="{% static 'assets/js/validation.js' %}"></script>
-      
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-CE0deH3Jhj6GN4YvdCFZS7DpbXexzGU"></script>
-      <script src="{% static 'assets/js/gmaps.js' %}"></script>
-      <script src="{% static 'assets/js/map-helper.js' %}"></script>
       
       <script type="text/javascript" src="{% static 'assets/js/creote-extension.js' %}"></script>
       {% block custom_js %}{% endblock custom_js %}

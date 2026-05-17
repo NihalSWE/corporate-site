@@ -86,21 +86,6 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-bold">Badge Logo/Image</label>
-              <input class="form-control" type="file" name="badge_image" accept="image/*">
-              <small class="text-muted">Required size: 52 x 52 pixels. Max size: 5KB. Leave empty to keep current.</small>
-              {% if section and section.badge_image %}
-                <div class="mt-2 d-flex align-items-center gap-3">
-                  <img src="{{ section.badge_image.url }}" alt="" style="width: 52px; height: 52px; object-fit: contain; border-radius: 50%;">
-                  <label class="form-check mb-0">
-                    <input class="form-check-input" type="checkbox" name="remove_badge_image">
-                    <span class="form-check-label">Remove existing image</span>
-                  </label>
-                </div>
-              {% endif %}
-            </div>
-
-            <div class="mb-3">
               <div class="d-flex justify-content-between">
                 <label class="form-label fw-bold">Description</label>
               </div>

@@ -352,6 +352,11 @@ class WebsiteFavicon(models.Model):
 class SiteHeaderSetting(models.Model):
     top_message = models.CharField(max_length=80, default="Welcome to our consulting company.")
     quote_button_text = models.CharField(max_length=20, default="Get a quote")
+    footer_description = models.CharField(
+        max_length=150,
+        blank=True,
+        default="Over 20 years of experience we'll ensure you always get the best guidance. We serve clients at every level of their organization...",
+    )
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -362,9 +367,9 @@ class SiteHeaderSetting(models.Model):
 # Home Page
 # =========================
 class HomeBanner(models.Model):
-    title = models.CharField(max_length=25)
-    subtitle = models.CharField(max_length=15)
-    description = models.CharField(max_length=100)
+    title = models.CharField(max_length=25, blank=True, default="")
+    subtitle = models.CharField(max_length=15, blank=True, default="")
+    description = models.CharField(max_length=100, blank=True, default="")
     title_color = models.CharField(max_length=7, blank=True, default="")
     subtitle_color = models.CharField(max_length=7, blank=True, default="")
     description_color = models.CharField(max_length=7, blank=True, default="")
@@ -448,8 +453,7 @@ class HomeWhyChooseSection(models.Model):
 
 class HomeWhyChooseItem(models.Model):
     title = models.CharField(max_length=20)
-    description = models.CharField(max_length=80)
-    icon = models.ImageField(upload_to="home/why_choose/", blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
@@ -511,12 +515,6 @@ class AboutHeroSection(models.Model):
     small_title = models.CharField(max_length=100, default="We are")
     title = models.CharField(max_length=180, default="Leaders in HR Solution")
     badge_text = models.CharField(max_length=150, default="Since 1998, Operating in Birmingham.")
-    badge_image = models.ImageField(
-        upload_to="about/hero/badge/",
-        validators=[validate_about_badge_image],
-        blank=True,
-        null=True,
-    )
     description = models.TextField()
     main_image = models.ImageField(
         upload_to="about/hero/",

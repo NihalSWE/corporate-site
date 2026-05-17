@@ -110,6 +110,7 @@ def branding_admin(request):
         favicon_file = request.FILES.get("favicon")
         top_message = request.POST.get("top_message", "").strip() or "Welcome to our consulting company."
         quote_button_text = request.POST.get("quote_button_text", "").strip() or "Get a quote"
+        footer_description = request.POST.get("footer_description", "").strip()
 
         if len(top_message) > 80:
             messages.error(request, "Top header message must be 80 characters or fewer.")
@@ -117,11 +118,15 @@ def branding_admin(request):
         if len(quote_button_text) > 20:
             messages.error(request, "Quote button text must be 20 characters or fewer.")
             return redirect("home_identity")
+        if len(footer_description) > 150:
+            messages.error(request, "Footer description must be 150 characters or fewer.")
+            return redirect("home_identity")
 
         try:
             header_setting = header_setting or SiteHeaderSetting()
             header_setting.top_message = top_message
             header_setting.quote_button_text = quote_button_text
+            header_setting.footer_description = footer_description
             header_setting.is_active = True
             header_setting.full_clean()
             header_setting.save()
@@ -187,9 +192,7 @@ def home_banner_admin(request):
             if request.FILES.get("image"):
                 banner.image = request.FILES["image"]
 
-            if not banner.title or not banner.subtitle or not banner.description:
-                messages.error(request, "Title, subtitle, and description are required.")
-            elif len(banner.subtitle) > 15:
+            if len(banner.subtitle) > 15:
                 messages.error(request, "Subtitle must be 15 characters or fewer.")
             elif len(banner.title) > 25:
                 messages.error(request, "Title must be 25 characters or fewer.")
@@ -223,7 +226,7 @@ def home_about_media_admin(request):
 
     if request.method == "POST":
         media = media or HomeAboutMedia()
-        media.video_url = request.POST.get("video_url", "").strip() or None
+        media.video_url = None
         media.is_active = bool(request.POST.get("is_active"))
 
         if request.FILES.get("big_image"):
@@ -233,8 +236,6 @@ def home_about_media_admin(request):
 
         if not media.big_image or not media.small_image:
             messages.error(request, "Big image and small image are required.")
-        elif not media.video_url:
-            messages.error(request, "Please enter a video URL.")
         else:
             try:
                 media.full_clean()
@@ -399,12 +400,17 @@ def home_why_choose_admin(request):
                 section.full_clean()
                 section.save()
 
-                for index in range(1, 5):
+                item_indexes = request.POST.getlist("item_index")
+                if not item_indexes:
+                    item_indexes = [str(index) for index in range(1, 5)]
+
+                for position, index in enumerate(item_indexes, start=1):
                     title = request.POST.get(f"item_title_{index}", "").strip()
                     description = request.POST.get(f"item_description_{index}", "").strip()
+                    description_text = strip_tags(description).replace("&nbsp;", " ").strip()
                     item_id = request.POST.get(f"item_id_{index}", "").strip()
 
-                    if not title and not description:
+                    if not title and not description_text:
                         if item_id:
                             HomeWhyChooseItem.objects.filter(id=item_id).delete()
                         continue
@@ -412,28 +418,25 @@ def home_why_choose_admin(request):
                     if len(title) > 20:
                         messages.error(request, f"Card {index} title must be 20 characters or fewer.")
                         return redirect("home_why_choose")
-                    if len(description) > 80:
-                        messages.error(request, f"Card {index} description must be 80 characters or fewer.")
+                    if len(description_text) > 350:
+                        messages.error(request, f"Card {position} description must be 350 characters or fewer.")
                         return redirect("home_why_choose")
 
                     item = HomeWhyChooseItem.objects.filter(id=item_id).first() if item_id else HomeWhyChooseItem()
                     item.title = title
-                    item.description = description
-                    item.sort_order = index
+                    item.description = description if description_text else ""
+                    item.sort_order = position
                     item.is_active = True
-                    if request.FILES.get(f"item_icon_{index}"):
-                        item.icon = request.FILES[f"item_icon_{index}"]
                     item.full_clean()
                     item.save()
 
-                HomeWhyChooseItem.objects.filter(sort_order__gt=4).delete()
                 messages.success(request, "Why Choose Us section saved successfully.")
             except Exception as exc:
                 messages.error(request, str(exc))
 
         return redirect("home_why_choose")
 
-    items = list(HomeWhyChooseItem.objects.order_by("sort_order", "id")[:4])
+    items = list(HomeWhyChooseItem.objects.order_by("sort_order", "id"))
     while len(items) < 4:
         items.append(None)
 
@@ -1077,15 +1080,11 @@ def about_hero_admin(request):
         section.video_url = request.POST.get("video_url", "").strip() or None
         section.is_active = bool(request.POST.get("is_active"))
 
-        if request.POST.get("remove_badge_image") and not request.FILES.get("badge_image"):
-            remove_uploaded_file(section, "badge_image")
         if request.POST.get("remove_main_image") and not request.FILES.get("main_image"):
             remove_uploaded_file(section, "main_image")
         if request.POST.get("remove_video_thumbnail") and not request.FILES.get("video_thumbnail"):
             remove_uploaded_file(section, "video_thumbnail")
 
-        if request.FILES.get("badge_image"):
-            section.badge_image = request.FILES["badge_image"]
         if request.FILES.get("main_image"):
             section.main_image = request.FILES["main_image"]
         if request.FILES.get("video_thumbnail"):
@@ -1097,9 +1096,7 @@ def about_hero_admin(request):
             messages.error(request, "Description is required.")
         else:
             try:
-                section.full_clean(exclude=["badge_image", "main_image", "video_thumbnail"])
-                if request.FILES.get("badge_image"):
-                    validate_about_badge_image(section.badge_image)
+                section.full_clean(exclude=["main_image", "video_thumbnail"])
                 if request.FILES.get("main_image"):
                     validate_about_hero_image(section.main_image)
                 if request.FILES.get("video_thumbnail"):
@@ -1271,13 +1268,6 @@ def sister_concern_admin(request):
                     concern.display_image = request.FILES["display_image"]
                 concern.full_clean()
                 concern.save()
-                update_fields = {}
-                if remove_logo:
-                    update_fields["logo"] = None
-                if remove_display_image:
-                    update_fields["display_image"] = None
-                if update_fields:
-                    SisterConcern.objects.filter(pk=concern.pk).update(**update_fields)
                 next_order = existing_gallery_count + 1
                 for offset, gallery_image in enumerate(gallery_images):
                     SisterConcernGalleryImage.objects.create(

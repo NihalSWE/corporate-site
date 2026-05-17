@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 def migrate_json_gallery(apps, schema_editor):
+    SisterConcern = apps.get_model('backend', 'SisterConcern')
     GalleryImage = apps.get_model('backend', 'SisterConcernGalleryImage')
     gallery_store = Path(settings.BASE_DIR) / "backend" / "sister_concern_gallery.json"
     if not gallery_store.exists():
@@ -24,6 +25,8 @@ def migrate_json_gallery(apps, schema_editor):
         return
 
     for concern_id, paths in data.items():
+        if not SisterConcern.objects.filter(pk=concern_id).exists():
+            continue
         if not isinstance(paths, list):
             continue
         for index, image_path in enumerate(paths, start=1):

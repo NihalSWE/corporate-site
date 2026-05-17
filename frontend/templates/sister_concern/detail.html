@@ -239,9 +239,9 @@
    <div class="parallax_cover">
       <div class="simpleParallax">
          {% if banner and banner.banner_image %}
-         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax" width="1907" height="323" loading="eager" fetchpriority="high" decoding="sync">
          {% else %}
-         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Sister Concern" class="cover-parallax">
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Sister Concern" class="cover-parallax" width="1920" height="654" loading="eager" fetchpriority="high" decoding="sync">
          {% endif %}
       </div>
    </div>
@@ -273,7 +273,7 @@
          <div class="sister-concern-flow">
             {% if concern.display_image_existing_url %}
             <div class="sister-concern-image">
-               <img src="{{ concern.display_image_existing_url }}" alt="{{ concern.title }}">
+               <img src="{{ concern.display_image_existing_url }}" alt="{{ concern.title }}" width="360" height="350" loading="lazy" decoding="async">
             </div>
             {% endif %}
             <div class="sister-concern-description">{{ concern.description|safe }}</div>
@@ -281,7 +281,7 @@
 
          {% if concern.logo_existing_url %}
          <div class="sister-logo-box">
-            <img src="{{ concern.logo_existing_url }}" alt="{{ concern.title }}">
+            <img src="{{ concern.logo_existing_url }}" alt="{{ concern.title }}" loading="lazy" decoding="async">
          </div>
          {% endif %}
 
@@ -297,7 +297,7 @@
             <div class="sister-gallery-grid">
                {% for image_url in gallery_images %}
                <a class="sister-gallery-item js-sister-gallery-image {% if forloop.counter > 4 %}is-hidden{% endif %}" href="{{ image_url }}" data-index="{{ forloop.counter0 }}">
-                  <img src="{{ image_url }}" alt="{{ concern.title }} gallery image {{ forloop.counter }}">
+                  <img src="{{ image_url }}" alt="{{ concern.title }} gallery image {{ forloop.counter }}" width="360" height="350" loading="lazy" decoding="async">
                </a>
                {% endfor %}
             </div>

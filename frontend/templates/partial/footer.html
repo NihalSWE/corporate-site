@@ -61,6 +61,13 @@
       color: #e8fffb !important;
       text-decoration: underline;
    }
+
+   .footer_phone_list a {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+   }
 </style>
 <section class="newsteller style_one bg_dark_1">
    <!--===============spacing==============-->
@@ -128,8 +135,11 @@
                       </div>
                       <div class="content_box">
                          <p class="color_white">
-                            Over 20 years of experience weâ€™ll ensure you always get the best guidance. We serve a
-                            clients at every level of their organization...
+                            {% if site_header_setting and site_header_setting.footer_description %}
+                            {{ site_header_setting.footer_description }}
+                            {% else %}
+                            Over 20 years of experience we'll ensure you always get the best guidance. We serve clients at every level of their organization...
+                            {% endif %}
                          </p>
 
                       </div>
@@ -258,7 +268,15 @@
                    <div class="contact_info_nbox type_one">
                       <div class="single">
                          <h6 class="color_white"> <span class="icon-telephone color_white"></span> Phone </h6>
-                         <p><a href="tel:{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+8801958666999{% endif %}" class="color_white">{% if site_contact and site_contact.phone %}{{ site_contact.phone }}{% else %}+880-1958-666999{% endif %}</a></p>
+                         <p class="footer_phone_list">
+                            {% if site_contact_phone_links %}
+                               {% for phone in site_contact_phone_links %}
+                               <a href="tel:{{ phone.href }}" class="color_white">{{ phone.label }}</a>
+                               {% endfor %}
+                            {% else %}
+                               <a href="tel:+8801958666999" class="color_white">+880-1958-666999</a>
+                            {% endif %}
+                         </p>
                       </div>
                    </div>
                    <!--===============spacing==============-->

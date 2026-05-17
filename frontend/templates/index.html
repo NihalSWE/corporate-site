@@ -35,62 +35,20 @@
       overflow: hidden;
       text-overflow: ellipsis;
    }
-   .home-about-lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 80px;
-      background: rgba(12, 15, 20, 0.88);
-   }
-   .home-about-lightbox.is-open { display: flex; }
-   .home-about-lightbox-inner { width: min(980px, calc(100vw - 160px)); }
-   .home-about-video-frame {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-   }
-   .home-about-video-frame iframe,
-   .home-about-video-frame video {
-      width: 100%;
+   .home-why-carousel .choose_box.type_one {
       height: 100%;
-      border: 0;
+   }
+   .home-why-carousel .choose_box.type_one .content_box {
+      min-height: 230px;
+      height: auto;
+   }
+   .home-why-carousel .choose_box.type_one .text_box .why-description {
+      overflow: visible;
       display: block;
-      background: #000;
+      white-space: normal;
    }
-   .home-about-video-fallback { margin-top: 16px; text-align: center; }
-   .home-about-video-fallback a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      padding: 0 18px;
-      border-radius: 4px;
-      background: #078586;
-      color: #fff;
-      font-weight: 700;
-   }
-   .home-about-video-close {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      width: 44px;
-      height: 44px;
-      border: 0;
-      border-radius: 4px;
-      background: rgba(0, 0, 0, 0.46);
-      color: #fff;
-      font-size: 32px;
-      line-height: 1;
-      cursor: pointer;
-   }
-   .image_box_new .video_box,
-   .image_box_new .video_box a {
-      z-index: 10;
-      pointer-events: auto;
+   .home-why-carousel .choose_box.type_one .text_box .why-description p {
+      margin-bottom: 10px;
    }
    .slider.style_page_thirteen {
       overflow: hidden;
@@ -174,8 +132,6 @@
       .home-business-card .icon_content {
          min-height: auto;
       }
-      .home-about-lightbox { padding: 58px 18px; }
-      .home-about-lightbox-inner { width: 100%; }
       .slider.style_page_thirteen .banner_carousel,
       .slider.style_page_thirteen .owl-stage-outer,
       .slider.style_page_thirteen .owl-stage,
@@ -208,12 +164,20 @@
                    <div class="row align-items-center">
                       <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 {% cycle 'm-auto' '' %}">
                          <div class="slider_content">
+                            {% if banner.subtitle %}
                             <h6 class="animate_left" {% if banner.subtitle_color %}style="color: {{ banner.subtitle_color }};"{% endif %}>{{ banner.subtitle }}</h6>
+                            {% endif %}
+                            {% if banner.title %}
                             <h1 class="animate_up" {% if banner.title_color %}style="color: {{ banner.title_color }};"{% endif %}>{{ banner.title }}</h1>
+                            {% endif %}
+                            {% if banner.description %}
                             <p class="animate_right pd_bottom_40" {% if banner.description_color %}style="color: {{ banner.description_color }};"{% endif %}>{{ banner.description }}</p>
+                            {% endif %}
+                            {% if banner.subtitle or banner.title or banner.description %}
                             <div class="theme_btn_all color_one animate_up">
                                <a href="{% url 'contact' %}" class="theme-btn one">Contact Us</a>
                             </div>
+                            {% endif %}
                          </div>
                       </div>
                    </div>
@@ -289,13 +253,6 @@
                       <img src="{{ home_about_media.big_image.url }}" class="img-fluid height_570px object-fit-cover" alt="{{ home_about.title|default:'About us' }}">
                       {% else %}
                       <img src="{% static 'assets/images/about/about-11.jpg' %}" class="img-fluid height_570px object-fit-cover" alt="About us">
-                      {% endif %}
-                   </div>
-                   <div class="video_box video-inner text-center">
-                      {% if home_about_video_url %}
-                      <a href="{{ home_about_video_url }}" class="js-home-about-video" data-src="{{ home_about_video_url }}" data-original="{{ home_about_video_original_url }}" data-kind="{% if home_about_video_is_direct %}video{% else %}iframe{% endif %}">
-                         <i class="icon-play"></i>
-                      </a>
                       {% endif %}
                    </div>
                    <div class="image_two">
@@ -619,38 +576,27 @@
           </div>
           <div class="row">
              {% if home_why_choose_items %}
+             <div class="col-lg-12">
+             <div class="home-why-carousel owl_nav_none owl_dots_none owl_type_two theme_carousel owl-theme owl-carousel"
+                data-options='{"loop": true, "margin": 30, "autoheight":true, "lazyload":true, "nav": true, "dots": true, "autoplay": true, "autoplayTimeout": 7000, "smartSpeed": 1800, "responsive":{ "0" :{ "items": "1" }, "576" :{ "items" : "2" }, "992":{ "items" : "3" }, "1200":{ "items" : "4" }}}'>
              {% for item in home_why_choose_items %}
-             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+             <div>
                 <div class="choose_box type_one">
-                   <div class="image_box">
-                      {% if item.icon %}
-                      <img src="{{ item.icon.url }}" class="img-fluid svg_image" alt="{{ item.title }}">
-                      {% elif forloop.counter == 1 %}
-                      <img src="{% static 'assets/images/24-hours-support.png' %}" class="img-fluid svg_image" alt="{{ item.title }}">
-                      {% elif forloop.counter == 2 %}
-                      <img src="{% static 'assets/images/email-marketing.png' %}" class="img-fluid svg_image" alt="{{ item.title }}">
-                      {% elif forloop.counter == 3 %}
-                      <img src="{% static 'assets/images/team-management.png' %}" class="img-fluid svg_image" alt="{{ item.title }}">
-                      {% else %}
-                      <img src="{% static 'assets/images/solution-1.png' %}" class="img-fluid svg_image" alt="{{ item.title }}">
-                      {% endif %}
-                   </div>
                    <div class="content_box">
                       <span class="step_no">{{ forloop.counter|stringformat:"02d" }}</span>
                       <div class="text_box">
                          <h2>{{ item.title }}</h2>
-                         <p>{{ item.description }}</p>
+                         <div class="why-description">{{ item.description|safe }}</div>
                       </div>
                    </div>
                 </div>
              </div>
              {% endfor %}
+             </div>
+             </div>
              {% else %}
              <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <div class="choose_box  type_one">
-                   <div class="image_box">
-                      <img src="{% static 'assets/images/24-hours-support.png' %}" class="img-fluid svg_image" alt="icon png">
-                   </div>
                    <div class="content_box">
                       <span class="step_no">01</span>
                       <div class="text_box">
@@ -668,9 +614,6 @@
              </div>
              <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <div class="choose_box  type_one">
-                   <div class="image_box">
-                      <img src="{% static 'assets/images/email-marketing.png' %}" class="img-fluid svg_image" alt="icon png">
-                   </div>
                    <div class="content_box">
                       <span class="step_no">02</span>
                       <div class="text_box">
@@ -688,9 +631,6 @@
              </div>
              <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <div class="choose_box  type_one">
-                   <div class="image_box">
-                      <img src="{% static 'assets/images/team-management.png' %}" class="img-fluid svg_image" alt="icon png">
-                   </div>
                    <div class="content_box">
                       <span class="step_no">03</span>
                       <div class="text_box">
@@ -708,9 +648,6 @@
              </div>
              <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <div class="choose_box  type_one">
-                   <div class="image_box">
-                      <img src="{% static 'assets/images/solution-1.png' %}" class="img-fluid svg_image" alt="icon png">
-                   </div>
                    <div class="content_box">
                       <span class="step_no">04</span>
                       <div class="text_box">
@@ -724,6 +661,7 @@
 
                   </div>
                </div>
+             </div>
              </div>
              {% endif %}
           </div>
@@ -853,16 +791,6 @@
     </section>
     <!--fag end-->
 
-    <div class="home-about-lightbox" id="homeAboutLightbox" aria-hidden="true">
-       <button class="home-about-video-close" type="button" id="homeAboutVideoClose" aria-label="Close">&times;</button>
-       <div class="home-about-lightbox-inner">
-          <div class="home-about-video-frame" id="homeAboutVideoFrame"></div>
-          <div class="home-about-video-fallback" id="homeAboutVideoFallback">
-             <a href="#" target="_blank" rel="noopener">Open video in new tab</a>
-          </div>
-       </div>
-    </div>
-
     <!--===============spacing==============-->
     <div class="pd_bottom_70"></div>
     <!--===============spacing==============-->
@@ -872,73 +800,3 @@
 
 
 {% endblock content %}
-
-{% block custom_js %}
-<script>
-   (function () {
-      const openButton = document.querySelector(".js-home-about-video");
-      const modal = document.getElementById("homeAboutLightbox");
-      const frame = document.getElementById("homeAboutVideoFrame");
-      const fallback = document.getElementById("homeAboutVideoFallback");
-      const fallbackLink = fallback ? fallback.querySelector("a") : null;
-      const closeButton = document.getElementById("homeAboutVideoClose");
-
-      function autoplayUrl(src) {
-         if (!src) return "";
-         if (src.indexOf("youtube.com/embed/") !== -1 || src.indexOf("player.vimeo.com/video/") !== -1) {
-            return src + (src.indexOf("?") === -1 ? "?" : "&") + "autoplay=1";
-         }
-         if (src.indexOf("facebook.com/plugins/video.php") !== -1) {
-            return src + (src.indexOf("?") === -1 ? "?" : "&") + "autoplay=true";
-         }
-         return src;
-      }
-
-      function closeVideo() {
-         if (!modal) return;
-         modal.classList.remove("is-open");
-         modal.setAttribute("aria-hidden", "true");
-         frame.innerHTML = "";
-         document.body.style.overflow = "";
-      }
-
-      if (openButton && modal && frame) {
-         openButton.addEventListener("click", function (event) {
-            const src = openButton.dataset.src || openButton.getAttribute("href");
-            if (!src || src === "#") return;
-            event.preventDefault();
-            const original = openButton.dataset.original || src;
-            const kind = openButton.dataset.kind || "iframe";
-            fallbackLink.href = original;
-            frame.innerHTML = "";
-            if (kind === "video") {
-               const video = document.createElement("video");
-               video.src = src;
-               video.controls = true;
-               video.autoplay = true;
-               video.playsInline = true;
-               frame.appendChild(video);
-            } else {
-               const iframe = document.createElement("iframe");
-               iframe.src = autoplayUrl(src);
-               iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share";
-               iframe.allowFullscreen = true;
-               iframe.referrerPolicy = "strict-origin-when-cross-origin";
-               frame.appendChild(iframe);
-            }
-            modal.classList.add("is-open");
-            modal.setAttribute("aria-hidden", "false");
-            document.body.style.overflow = "hidden";
-         });
-
-         closeButton.addEventListener("click", closeVideo);
-         modal.addEventListener("click", function (event) {
-            if (event.target === modal) closeVideo();
-         });
-         document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") closeVideo();
-         });
-      }
-   })();
-</script>
-{% endblock custom_js %}

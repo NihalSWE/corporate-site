@@ -2,7 +2,16 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12 footer-copyright text-center">
-        <p class="mb-0">Custom admin panel</p>
+        <p class="mb-0">
+          {% if site_copyright %}
+            {{ site_copyright }}
+          {% else %}
+            &copy; Copyright <a href="https://iglgroup.org/" target="_blank" rel="noopener">IGL Group</a> 2007-{% now "Y" %}<br>
+            Domain Registered By <a href="https://iglweb.com/web/home.php" target="_blank" rel="noopener">IGL Web Ltd</a> |
+            Hosting Service Provided by <a href="https://iglweb.com/web/home.php" target="_blank" rel="noopener">IGL Host Llc.com</a> |
+            Web Design &amp; Development by <a href="https://iglweb.com/web/home.php" target="_blank" rel="noopener">IGL Web Ltd</a>
+          {% endif %}
+        </p>
       </div>
     </div>
   </div>

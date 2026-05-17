@@ -89,13 +89,6 @@ def home(request):
     about_excerpt = about_description[:500] + "..." if len(about_description) > 500 else about_description
 
     about_media = HomeAboutMedia.objects.filter(is_active=True).first()
-    about_video_url = ""
-    about_video_is_direct = False
-    about_video_original_url = ""
-    if about_media:
-        about_video_original_url = about_media.video_url or ""
-        about_video_url, about_video_is_direct = normalize_video_url(about_media.video_url)
-
     home_sister_concerns = list(SisterConcern.objects.filter(is_active=True))
     for concern in home_sister_concerns:
         attach_sister_concern_asset_urls(concern)
@@ -109,15 +102,12 @@ def home(request):
             "home_about": about_section,
             "home_about_excerpt": about_excerpt,
             "home_about_media": about_media,
-            "home_about_video_url": about_video_url,
-            "home_about_video_is_direct": about_video_is_direct,
-            "home_about_video_original_url": about_video_original_url,
             "home_business_section": HomeBusinessSection.objects.filter(is_active=True).first(),
             "home_business_items": HomeBusinessItem.objects.filter(is_active=True).order_by("sort_order", "id")[:3],
             "home_services_section": HomeServiceSection.objects.filter(is_active=True).first(),
             "home_sister_concerns": home_sister_concerns,
             "home_why_choose_section": HomeWhyChooseSection.objects.filter(is_active=True).first(),
-            "home_why_choose_items": HomeWhyChooseItem.objects.filter(is_active=True).order_by("sort_order", "id")[:4],
+            "home_why_choose_items": HomeWhyChooseItem.objects.filter(is_active=True).order_by("sort_order", "id"),
             "home_faq_section": HomeFAQSection.objects.filter(is_active=True).first(),
             "home_faq_items": HomeFAQItem.objects.filter(is_active=True).order_by("sort_order", "id")[:4],
         },

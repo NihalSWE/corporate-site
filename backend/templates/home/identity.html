@@ -43,6 +43,17 @@
                         </div>
                     </div>
 
+                    <div class="col-lg-12">
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label fw-bold">Footer Short Description</label>
+                                <small class="text-muted"><span id="footer-description-count">0</span>/150</small>
+                            </div>
+                            <textarea name="footer_description" id="footer-description" class="form-control" rows="3" maxlength="150">{{ header_setting.footer_description|default:'' }}</textarea>
+                            <small class="text-muted d-block mt-2">Shown under the footer logo.</small>
+                        </div>
+                    </div>
+
                     <div class="col-lg-6">
                         <div class="border rounded p-3 h-100">
                             <label class="form-label fw-bold">Website Logo</label>
@@ -86,8 +97,10 @@
     (function () {
         const topMessage = document.getElementById("top-message");
         const quoteButton = document.getElementById("quote-button-text");
+        const footerDescription = document.getElementById("footer-description");
         const topCount = document.getElementById("top-message-count");
         const quoteCount = document.getElementById("quote-button-count");
+        const footerDescriptionCount = document.getElementById("footer-description-count");
 
         function syncCount(field, counter, limit) {
             if (field.value.length > limit) {
@@ -99,9 +112,10 @@
         function syncAll() {
             syncCount(topMessage, topCount, 80);
             syncCount(quoteButton, quoteCount, 20);
+            syncCount(footerDescription, footerDescriptionCount, 150);
         }
 
-        [topMessage, quoteButton].forEach(function (field) {
+        [topMessage, quoteButton, footerDescription].forEach(function (field) {
             field.addEventListener("input", syncAll);
             field.addEventListener("paste", function () {
                 setTimeout(syncAll, 0);

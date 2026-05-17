@@ -52,9 +52,9 @@
    <div class="parallax_cover">
       <div class="simpleParallax">
          {% if banner and banner.banner_image %}
-         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax" width="1907" height="323" loading="eager" fetchpriority="high" decoding="sync">
          {% else %}
-         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Contact" class="cover-parallax">
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Contact" class="cover-parallax" width="1920" height="654" loading="eager" fetchpriority="high" decoding="sync">
          {% endif %}
       </div>
    </div>

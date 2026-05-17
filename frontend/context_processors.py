@@ -15,6 +15,20 @@ from backend.models import (
 from backend.content_helpers import attach_sister_concern_asset_urls, split_contact_addresses
 
 
+def split_contact_phones(phone):
+    if not phone:
+        return []
+    return [item.strip() for item in re.split(r"[,;\n]+", phone) if item.strip()]
+
+
+def phone_tel_value(phone):
+    if not phone:
+        return ""
+    prefix = "+" if phone.strip().startswith("+") else ""
+    digits = re.sub(r"\D", "", phone)
+    return f"{prefix}{digits}" if digits else ""
+
+
 def sister_concerns(request):
     site_contact = ContactInfo.objects.filter(is_active=True).first() or ContactInfo.objects.first()
     site_whatsapp_url = ""
@@ -30,6 +44,7 @@ def sister_concerns(request):
                 site_whatsapp_url = f"https://wa.me/{whatsapp_number}"
 
     site_contact_addresses = split_contact_addresses(site_contact.address if site_contact else "")
+    site_contact_phones = split_contact_phones(site_contact.phone if site_contact else "")
 
     nav_sister_concerns = list(SisterConcern.objects.filter(is_active=True).order_by("sort_order", "title"))
     for concern in nav_sister_concerns:
@@ -40,6 +55,11 @@ def sister_concerns(request):
         "site_contact": site_contact,
         "site_contact_address": site_contact_addresses[0] if site_contact_addresses else "",
         "site_contact_addresses": site_contact_addresses,
+        "site_contact_phones": site_contact_phones,
+        "site_contact_phone_links": [
+            {"label": phone, "href": phone_tel_value(phone)}
+            for phone in site_contact_phones
+        ],
         "site_whatsapp_url": site_whatsapp_url,
         "site_logo": Logo.objects.filter(is_active=True).first(),
         "site_favicon": WebsiteFavicon.objects.filter(is_active=True).first(),

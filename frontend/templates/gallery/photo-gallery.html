@@ -20,7 +20,7 @@
 
 {% block content %}
 <div class="page_header_default style_one">
-   <div class="parallax_cover"><div class="simpleParallax">{% if banner and banner.banner_image %}<img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">{% else %}<img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Photo Gallery" class="cover-parallax">{% endif %}</div></div>
+   <div class="parallax_cover"><div class="simpleParallax">{% if banner and banner.banner_image %}<img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax" width="1907" height="323" loading="eager" fetchpriority="high" decoding="sync">{% else %}<img src="{% static 'assets/images/page-header-default.jpg' %}" alt="Photo Gallery" class="cover-parallax" width="1920" height="654" loading="eager" fetchpriority="high" decoding="sync">{% endif %}</div></div>
    <div class="page_header_content"><div class="auto-container"><div class="row"><div class="col-md-12"><div class="banner_title_inner"><div class="title_page">{{ banner.title|default:"Photo Gallery" }}</div></div></div><div class="col-lg-12"><div class="breadcrumbs creote"><ul class="breadcrumb m-auto"><li><a href="{% url 'home' %}">Home</a></li><li class="active">{{ banner.title|default:"Photo Gallery" }}</li></ul></div></div></div></div></div>
 </div>
 

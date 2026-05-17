@@ -4,6 +4,7 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
     .sister-editor-shell {
+        display: none;
         border: 1px solid #e3e8ef;
         border-radius: 12px;
         overflow: hidden;
@@ -126,98 +127,6 @@
                             </td>
                         </tr>
 
-                        <div class="modal fade" id="editSisterConcernModal{{ concern.id }}" tabindex="-1">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Edit Sister Concern</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form method="POST" enctype="multipart/form-data" class="sister-concern-form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="edit">
-                                        <input type="hidden" name="id" value="{{ concern.id }}">
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-md-8 mb-3">
-                                                    <label class="form-label">Title</label>
-                                                    <input type="text" name="title" class="form-control" value="{{ concern.title }}" required>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label class="form-label">Order</label>
-                                                    <input type="number" name="sort_order" class="form-control" value="{{ concern.sort_order }}">
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Description</label>
-                                                <input type="hidden" name="description" value="{{ concern.description|escape }}">
-                                                <div class="sister-editor-shell">
-                                                    <div class="sister-description-editor">{{ concern.description|safe }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Link</label>
-                                                <input type="url" name="link" class="form-control" value="{{ concern.link|default:'' }}" placeholder="https://example.com">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Logo Image</label><br>
-                                                {% if concern.logo_existing_url %}
-                                                <div class="mb-2 d-flex align-items-center gap-3">
-                                                    <img src="{{ concern.logo_existing_url }}" width="160" class="rounded border bg-white p-2" alt="{{ concern.title }}">
-                                                    <label class="form-check mb-0">
-                                                        <input class="form-check-input" type="checkbox" name="remove_logo" value="1">
-                                                        <span class="form-check-label">Remove existing logo</span>
-                                                    </label>
-                                                </div>
-                                                {% endif %}
-                                                <input type="file" name="logo" class="form-control" accept="image/*">
-                                                <small class="text-muted">Optional. Leave empty to keep the current logo.</small>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Display Image</label><br>
-                                                {% if concern.display_image_existing_url %}
-                                                <div class="mb-2 d-flex align-items-center gap-3">
-                                                    <img src="{{ concern.display_image_existing_url }}" width="160" height="156" class="rounded border bg-white p-2" style="object-fit:cover;" alt="{{ concern.title }}">
-                                                    <label class="form-check mb-0">
-                                                        <input class="form-check-input" type="checkbox" name="remove_display_image" value="1">
-                                                        <span class="form-check-label">Remove existing display image</span>
-                                                    </label>
-                                                </div>
-                                                {% endif %}
-                                                <input type="file" name="display_image" class="form-control" accept="image/*">
-                                                <small class="text-muted">Optional. If uploaded, required size: 360 x 350 pixels. Max size: 50KB. Leave empty to keep current image.</small>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Gallery Images</label>
-                                                {% if concern.gallery_items %}
-                                                <div class="sister-gallery-admin">
-                                                    {% for image in concern.gallery_items %}
-                                                    <div class="sister-gallery-admin-item">
-                                                        <img src="{{ image.existing_url }}" alt="{{ concern.title }}">
-                                                        <label class="form-check mb-0">
-                                                            <input class="form-check-input" type="checkbox" name="remove_gallery_images" value="{{ image.id }}">
-                                                            <span class="form-check-label">Remove</span>
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                                {% endif %}
-                                                <input type="file" name="gallery_images" class="form-control sister-gallery-input" accept="image/*" multiple data-gallery-current="{{ concern.gallery_items|length }}" data-gallery-max="10" {% if concern.gallery_slots_remaining <= 0 %}disabled{% endif %}>
-                                                <div class="sister-gallery-error" role="alert"></div>
-                                                <small class="text-muted">Optional. Upload up to {{ concern.gallery_slots_remaining }} more image(s). Total limit: 10. Required size: 360 x 350 pixels. Max size: 50KB each.</small>
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive{{ concern.id }}" {% if concern.is_active %}checked{% endif %}>
-                                                <label class="form-check-label" for="isActive{{ concern.id }}">Show on frontend</label>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-primary">Save Changes</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
                         {% empty %}
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">No sister concerns have been added yet.</td>
@@ -229,6 +138,101 @@
         </div>
     </div>
 </div>
+
+{% for concern in sister_concerns %}
+<div class="modal fade" id="editSisterConcernModal{{ concern.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Sister Concern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="sister-concern-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="id" value="{{ concern.id }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" value="{{ concern.title }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="{{ concern.sort_order }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control sister-description-input" rows="7">{{ concern.description }}</textarea>
+                        <div class="sister-editor-shell">
+                            <div class="sister-description-editor">{{ concern.description|safe }}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link</label>
+                        <input type="url" name="link" class="form-control" value="{{ concern.link|default:'' }}" placeholder="https://example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Logo Image</label><br>
+                        {% if concern.logo_existing_url %}
+                        <div class="mb-2 d-flex align-items-center gap-3">
+                            <img src="{{ concern.logo_existing_url }}" width="160" class="rounded border bg-white p-2" alt="{{ concern.title }}">
+                            <label class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" name="remove_logo" value="1">
+                                <span class="form-check-label">Remove existing logo</span>
+                            </label>
+                        </div>
+                        {% endif %}
+                        <input type="file" name="logo" class="form-control" accept="image/*">
+                        <small class="text-muted">Optional. Leave empty to keep the current logo.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Display Image</label><br>
+                        {% if concern.display_image_existing_url %}
+                        <div class="mb-2 d-flex align-items-center gap-3">
+                            <img src="{{ concern.display_image_existing_url }}" width="160" height="156" class="rounded border bg-white p-2" style="object-fit:cover;" alt="{{ concern.title }}">
+                            <label class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" name="remove_display_image" value="1">
+                                <span class="form-check-label">Remove existing display image</span>
+                            </label>
+                        </div>
+                        {% endif %}
+                        <input type="file" name="display_image" class="form-control" accept="image/*">
+                        <small class="text-muted">Optional. If uploaded, required size: 360 x 350 pixels. Max size: 50KB. Leave empty to keep current image.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gallery Images</label>
+                        {% if concern.gallery_items %}
+                        <div class="sister-gallery-admin">
+                            {% for image in concern.gallery_items %}
+                            <div class="sister-gallery-admin-item">
+                                <img src="{{ image.existing_url }}" alt="{{ concern.title }}">
+                                <label class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" name="remove_gallery_images" value="{{ image.id }}">
+                                    <span class="form-check-label">Remove</span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <input type="file" name="gallery_images" class="form-control sister-gallery-input" accept="image/*" multiple data-gallery-current="{{ concern.gallery_items|length }}" data-gallery-max="10" {% if concern.gallery_slots_remaining <= 0 %}disabled{% endif %}>
+                        <div class="sister-gallery-error" role="alert"></div>
+                        <small class="text-muted">Optional. Upload up to {{ concern.gallery_slots_remaining }} more image(s). Total limit: 10. Required size: 360 x 350 pixels. Max size: 50KB each.</small>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_active" class="form-check-input" id="isActive{{ concern.id }}" {% if concern.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="isActive{{ concern.id }}">Show on frontend</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 <div class="modal fade" id="addSisterConcernModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -253,7 +257,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <input type="hidden" name="description">
+                        <textarea name="description" class="form-control sister-description-input" rows="7"></textarea>
                         <div class="sister-editor-shell">
                             <div class="sister-description-editor"></div>
                         </div>
@@ -307,17 +311,20 @@
         ];
 
         document.querySelectorAll(".sister-description-editor").forEach(function (editorElement) {
+            const form = editorElement.closest("form");
+            const descriptionInput = form ? form.querySelector(".sister-description-input") : null;
+            if (!form || !descriptionInput || typeof Quill === "undefined") return;
+
+            editorElement.innerHTML = descriptionInput.value || "";
             const quill = new Quill(editorElement, {
                 theme: "snow",
                 modules: { toolbar: toolbarOptions },
                 placeholder: "Write the sister concern description..."
             });
-            const form = editorElement.closest("form");
-            const hiddenInput = form ? form.querySelector("[name='description']") : null;
-            if (!form || !hiddenInput) return;
-            form.addEventListener("submit", function () {
-                hiddenInput.value = quill.root.innerHTML;
-            });
+            descriptionInput.classList.add("d-none");
+            const editorShell = editorElement.closest(".sister-editor-shell");
+            if (editorShell) editorShell.style.display = "block";
+            editorElement.sisterConcernQuill = quill;
         });
 
         function selectedRemovalCount(form) {
@@ -365,6 +372,12 @@
 
         document.querySelectorAll(".sister-concern-form").forEach(function (form) {
             form.addEventListener("submit", function (event) {
+                const editorElement = form.querySelector(".sister-description-editor");
+                const descriptionInput = form.querySelector(".sister-description-input");
+                if (editorElement && editorElement.sisterConcernQuill && descriptionInput) {
+                    descriptionInput.value = editorElement.sisterConcernQuill.root.innerHTML;
+                }
+
                 const galleryInput = form.querySelector(".sister-gallery-input");
                 if (galleryInput && !validateGalleryLimit(galleryInput, false)) {
                     event.preventDefault();

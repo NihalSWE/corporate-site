@@ -104,6 +104,12 @@
    .about-flow-content p {
       margin-bottom: 24px;
    }
+   .about-page-main .extra_content.image_with_content .simple_image {
+      padding-left: 0;
+   }
+   .about-page-main .extra_content.image_with_content .simple_image h2 {
+      margin-left: 0;
+   }
    .about-flow-action {
       clear: both;
       padding-top: 8px;
@@ -137,9 +143,9 @@
    <div class="parallax_cover">
       <div class="simpleParallax">
          {% if banner and banner.banner_image %}
-         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax">
+         <img src="{{ banner.banner_image.url }}" alt="{{ banner.title }}" class="cover-parallax" width="1907" height="323" loading="eager" fetchpriority="high" decoding="sync">
          {% else %}
-         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="About Us" class="cover-parallax">
+         <img src="{% static 'assets/images/page-header-default.jpg' %}" alt="About Us" class="cover-parallax" width="1920" height="654" loading="eager" fetchpriority="high" decoding="sync">
          {% endif %}
       </div>
    </div>
@@ -203,11 +209,6 @@
                   <div class="pd_bottom_15"></div>
                   <div class="extra_content image_with_content dark_color">
                      <div class="simple_image">
-                        {% if hero_section and hero_section.badge_image %}
-                        <img src="{{ hero_section.badge_image.url }}" alt="{{ hero_section.badge_text|default:'Badge' }}">
-                        {% else %}
-                        <img src="{% static 'assets/images/cuntry-1.png' %}" alt="country">
-                        {% endif %}
                         <h2>{{ hero_section.badge_text|default:"Since 1998, Operating in Birmingham." }}</h2>
                      </div>
                   </div>
